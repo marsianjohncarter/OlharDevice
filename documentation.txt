@@ -1,0 +1,37 @@
+Вам понадобится питон :)
+
+sudo apt-get install python3
+
+
+
+1. Включите I2C на устройстве (Если еще не включено):
+
+sudo nano /boot/armbianEnv.txt
+
+Добавьте (или раскомментируйте) следующую строку:
+
+overlays=i2c0
+
+После этого перезагрузите системy.
+
+
+2. Установите необходимые пакеты:
+
+sudo apt install python3-pip i2c-tools
+
+
+3. Установите библиотеки:
+
+pip3 install adafruit-blinka
+
+
+pip3 install adafruit-circuitpython-pn532
+
+
+4. Запустите файл командой:
+
+
+python3 nfc-module.py
+
+
+

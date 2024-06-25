@@ -1,0 +1,134 @@
+import os
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation
+from PyQt5.QtGui import QPixmap
+import qrcode
+from services import Services
+from video_player import VideoPlayer
+
+service = Services()
+
+BASE_URL = 'https://api.olhar.media/'
+BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
+LOADED_VIDEOS_PATH = "./assets/videos/"
+
+
+class Second(QMainWindow):
+    def __init__(self, parent=None):
+        super(App).__init__(parent)
+
+class App(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Видеоплеер")
+        self.showFullScreen()
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+        self.video_player = VideoPlayer()
+        self.layout.addWidget(self.video_player)
+        self.message_label = QLabel("Воспользуйтесь Вашим предложением прямо сейчас!", self)
+        self.message_label.setAlignment(Qt.AlignCenter)
+        self.message_label.setStyleSheet("font-size: 60px;")
+        self.message_label.hide()
+        self.layout.addWidget(self.message_label)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.qr_code_label = QLabel(self)
+        self.qr_code_label.setAlignment(Qt.AlignCenter)
+        self.qr_code_label.setStyleSheet("""
+            QLabel {
+                margin-bottom: 20px;
+                border-radius: 15px;
+            }
+        """)
+        self.qr_code_label.hide()
+        self.layout.addWidget(self.qr_code_label, 0, Qt.AlignBottom)
+        self.current_video_index = 0
+        self.video_list = []
+        self.video_data = []
+        self.logs = {
+                "app.load_video_data": "",
+                "app.load_videos": "",
+                "app.play_next_video": "",
+                "app.show_qr_code": "",
+            }
+        self.video_player.finished.connect(self.fade_out_video)
+    def load_video_data(self, video_data):
+        try:
+            self.video_data = video_data
+            self.logs["app.load_video_data"] = "Список видео успешно загружен."
+        except Exception as e:
+            self.logs["app.load_video_data"] = f"Ошибка при загрузке списка видео: {e}"
+
+    def load_videos(self, video_data):
+        self.video_list = [BASE_URL + "videos/"+ video['serverfilename'] for video in video_data]
+        if self.video_list:
+            self.play_next_video()
+
+    def play_next_video(self):
+        self.qr_code_label.hide()
+        self.message_label.hide()
+        self.video_player.video_widget.show()
+        if self.current_video_index < len(self.video_list):
+            try:
+                current_video_data = self.video_data[self.current_video_index]
+                video_filename = current_video_data['serverfilename']
+                video_url = self.video_list[self.current_video_index]
+                local_video_path = os.path.join(LOADED_VIDEOS_PATH, video_filename)
+                if os.path.exists(local_video_path):
+                    self.video_player.show_local_video(local_video_path)
+                else:
+                    service.download_video(video_url, local_video_path)
+                    self.video_player.show_local_video(local_video_path)
+                prev_video_filename = self.video_data[self.current_video_index - 1]['serverfilename'] if self.current_video_index > 0 else None
+                if prev_video_filename:
+                    service.delete_file(os.path.join(LOADED_VIDEOS_PATH, prev_video_filename))
+                self.logs["app.play_next_video"] = "Видео успешно загружено."
+            except Exception as e:
+                self.logs["app.play_next_video"] = f"Ошибка при загрузке видео: {e}"
+            self.current_video_index += 1
+
+    def fade_out_video(self):
+        self.show_qr_code()
+
+    def show_qr_code(self):
+        self.video_player.video_widget.hide()
+        try:
+            if self.current_video_index > 0:
+                current_video_data = self.video_data[self.current_video_index - 1]
+                video_id = current_video_data['id']
+                equip_id = service.get_param_from_config('config.ini', 'PN')
+                equip_ip = "192.168.1.1"
+                url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat=40&gpslon=40"
+                qr = qrcode.QRCode( 
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(url)
+                qr.make(fit=True)
+                img = qr.make_image(fill='black', back_color='white')
+                img.save('qr_code.png')
+                pixmap = QPixmap('qr_code.png')
+                self.qr_code_label.setPixmap(pixmap)
+                self.qr_code_label.show()
+                self.message_label.show()
+                self.qr_opacity_effect = QGraphicsOpacityEffect(self.qr_code_label)
+                self.qr_code_label.setGraphicsEffect(self.qr_opacity_effect)
+                self.message_opacity_effect = QGraphicsOpacityEffect(self.message_label)
+                self.message_label.setGraphicsEffect(self.message_opacity_effect)
+                self.qr_opacity_animation = QPropertyAnimation(self.qr_opacity_effect, b"opacity")
+                self.qr_opacity_animation.setDuration(3000)
+                self.qr_opacity_animation.setStartValue(0)
+                self.qr_opacity_animation.setEndValue(1)
+                self.qr_opacity_animation.start()
+                self.message_opacity_animation = QPropertyAnimation(self.message_opacity_effect, b"opacity")
+                self.message_opacity_animation.setDuration(3000)
+                self.message_opacity_animation.setStartValue(0)
+                self.message_opacity_animation.setEndValue(1)
+                self.message_opacity_animation.start()
+                QTimer.singleShot(5000, self.play_next_video)
+                self.logs["app.show_qr_code"] = "QR-код и сообщение успешно отображены."
+        except Exception as e:
+            self.logs["app.show_qr_code"] = f"Ошибка при отображении QR-кода и сообщения: {e}"
