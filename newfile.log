@@ -1,0 +1,7 @@
+2024-06-25 09:57:35,496 Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-25 09:57:36,355 https://api.olhar.media:443 "POST /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-06-25 09:57:36,360 [WinError 2] The system cannot find the file specified
+2024-06-25 09:57:36,360 Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-25 09:57:36,988 https://api.olhar.media:443 "POST /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-06-25 09:57:37,230 Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-25 09:57:38,049 https://api.olhar.media:443 "GET /videos/sample720_1.mkv HTTP/1.1" 200 29441393

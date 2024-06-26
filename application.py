@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphics
 from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation
 from PyQt5.QtGui import QPixmap
 import qrcode
+import requests
 from services import Services
 from video_player import VideoPlayer
 
@@ -53,6 +54,16 @@ class App(QMainWindow):
                 "app.show_qr_code": "",
             }
         self.video_player.finished.connect(self.fade_out_video)
+
+    def download_video(self, url, local_video_path: str):
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(f"{local_video_path}", "wb") as file:
+                for chunk in response.iter_content(chunk_size=1024*1024):
+                    file.write(chunk)
+        else:
+            pass
+
     def load_video_data(self, video_data):
         try:
             self.video_data = video_data
@@ -61,7 +72,14 @@ class App(QMainWindow):
             self.logs["app.load_video_data"] = f"Ошибка при загрузке списка видео: {e}"
 
     def load_videos(self, video_data):
-        self.video_list = [BASE_URL + "videos/"+ video['serverfilename'] for video in video_data]
+        for i in self.video_data:
+            local_video_path = os.path.join(LOADED_VIDEOS_PATH, i['serverfilename'])
+            if not os.path.exists(local_video_path):
+                self.download_video(BASE_URL + "videos/"+ i['serverfilename'], local_video_path)
+            else:
+                pass
+
+        self.video_list = [video['serverfilename'] for video in video_data]
         if self.video_list:
             self.play_next_video()
 
@@ -71,19 +89,18 @@ class App(QMainWindow):
         self.video_player.video_widget.show()
         if self.current_video_index < len(self.video_list):
             try:
-                current_video_data = self.video_data[self.current_video_index]
-                video_filename = current_video_data['serverfilename']
-                video_url = self.video_list[self.current_video_index]
-                local_video_path = os.path.join(LOADED_VIDEOS_PATH, video_filename)
-                if os.path.exists(local_video_path):
+                for i in self.video_data:
+                    # current_video_data = self.video_data[self.current_video_index]
+                    current_video_data = i
+                    video_filename = current_video_data['serverfilename']
+                    local_video_path = os.path.join(LOADED_VIDEOS_PATH, video_filename)
+                    
                     self.video_player.show_local_video(local_video_path)
-                else:
-                    service.download_video(video_url, local_video_path)
-                    self.video_player.show_local_video(local_video_path)
-                prev_video_filename = self.video_data[self.current_video_index - 1]['serverfilename'] if self.current_video_index > 0 else None
-                if prev_video_filename:
-                    service.delete_file(os.path.join(LOADED_VIDEOS_PATH, prev_video_filename))
-                self.logs["app.play_next_video"] = "Видео успешно загружено."
+    
+                # prev_video_filename = self.video_data[self.current_video_index - 1]['serverfilename'] if self.current_video_index > 0 else None
+                # if prev_video_filename:
+                #     service.delete_file(os.path.join(LOADED_VIDEOS_PATH, prev_video_filename))
+                # self.logs["app.play_next_video"] = "Видео успешно загружено."
             except Exception as e:
                 self.logs["app.play_next_video"] = f"Ошибка при загрузке видео: {e}"
             self.current_video_index += 1

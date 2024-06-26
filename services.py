@@ -92,17 +92,6 @@ class Services:
         g = geocoder.ip('me')
         return g.latlng
 
-
-    def download_video(self, video_url: str, local_video_path: str):
-        response = requests.get(video_url, stream=True)
-        if response.status_code == 200:
-            with open(f"{local_video_path}", "wb") as file:
-                for chunk in response.iter_content(chunk_size=1024*1024):
-                    file.write(chunk)
-            self.logs["service.download_video"] = "Видео успешно загружено."
-        else:
-            self.logs["service.download_video"] = f"Не удалось загрузить видео. Статус код: {response.status_code}"
-
     def get_logs(self, _class):
         return _class.logs
     
