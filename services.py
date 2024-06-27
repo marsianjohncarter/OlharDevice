@@ -4,12 +4,13 @@ import subprocess
 import configparser
 import geocoder
 import ast
+import logging
+
 
 class Services:
     def __init__(self):
-        self.logs = {
-            "service.run_bash":"",
-        }
+        self.logger = self.get_logger('services')
+        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
     def run_bash(self, script_path):
         try:
@@ -27,25 +28,22 @@ class Services:
         except Exception as e:
             self.logs["service.run_python"] = f"Ошибка при выполнении python скрипта: {e}"
             
-
     def fetch_json(self, url):
-        response = requests.post(url)
+        response = requests.get(url)
         if (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
             try:
-                self.logs["service.fetch_json"] = "JSON успешно загружен."
                 return response.json()
             except ValueError:
-                self.logs["service.fetch_json"] = "Не удалось прочитать JSON. Статус код: " + str(response.status_code)
                 return response.status_code
         return None
 
     def fetch_script(self, url):
-        response = requests.post(url)
+        response = requests.get(url)
         if response.status_code != 204:
-            self.logs["service.fetch_script"] = "Скрипт успешно загружен."
+            self.logger.info('Script loaded successfully')
             return response.text
-        self.logs["service.fetch_script"] = "Не удалось загрузить скрипт. Статус код: " + str(response.status_code)
+        self.logger.error(f'Error loading script: {response.status_code}')
         return None
 
     def is_valid_python(self, code):
@@ -74,27 +72,38 @@ class Services:
         }
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            self.logs["service.register_video_view"] = "Регистрация показа видео прошла успешно."
+            self.logger.info('Video view registered successfully')
         else:
-            self.logs["service.register_video_view"] = f"Ошибка регистрации показа видео: {response.status_code}"
+            self.logger.error(f'Error registering video view: {response.status_code}')
 
     def get_param_from_config(self, config_path: str, param_name: str):
         config = configparser.ConfigParser()
         try:
             config.read(f'{config_path}')
             part_number = config['General'][f'{param_name}']
-            self.logs["service.get_param_from_config"] = "Чтение конфигурационного файла прошло успешно."
             return part_number
-        except Exception as e:
-            self.logs["service.get_param_from_config"] = f"Ошибка при чтении конфигурационного файла: {e}"
+        except FileNotFoundError:
+            self.logger.error(f'Config file not found: {config_path}')
+            return None
 
     def get_lat_lon(self):
         g = geocoder.ip('me')
         return g.latlng
 
-    def get_logs(self, _class):
-        return _class.logs
-    
     def delete_file(self, path):
-        os.remove(path)
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                self.logger.info(f'Deleted file: {path}')
+            except PermissionError:
+                self.logger.error(f'Error deleting file: {path}')
+
+
+    def get_logger(self, name):
+        log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'
+        logging.basicConfig(level=logging.DEBUG,
+                            format=log_format,
+                            filename='dev.log',
+                            filemode='w')
+        return logging.getLogger(name)
 

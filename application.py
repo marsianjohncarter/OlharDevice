@@ -6,12 +6,15 @@ import qrcode
 import requests
 from services import Services
 from video_player import VideoPlayer
-
+import logging
 service = Services()
 
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 LOADED_VIDEOS_PATH = "./assets/videos/"
+
+
+logger = service.get_logger('application')
 
 
 class Second(QMainWindow):
@@ -58,11 +61,16 @@ class App(QMainWindow):
     def download_video(self, url, local_video_path: str):
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            with open(f"{local_video_path}", "wb") as file:
-                for chunk in response.iter_content(chunk_size=1024*1024):
-                    file.write(chunk)
+            logger.info(f"Downloading video {local_video_path}...")
+            try:
+                with open(f"{local_video_path}", "wb") as file:
+                    for chunk in response.iter_content(chunk_size=1024*1024):
+                        file.write(chunk)
+                logger.info(f"Video {local_video_path} downloaded successfully")
+            except Exception as e:
+                logger.critical(f"Video could not be downloaded. Error: {e}")
         else:
-            pass
+            logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
     def load_video_data(self, video_data):
         try:
@@ -77,7 +85,8 @@ class App(QMainWindow):
             if not os.path.exists(local_video_path):
                 self.download_video(BASE_URL + "videos/"+ i['serverfilename'], local_video_path)
             else:
-                pass
+                logger.info(f"Video {i['serverfilename']} already downloaded.")
+
 
         self.video_list = [video['serverfilename'] for video in video_data]
         if self.video_list:
@@ -88,23 +97,13 @@ class App(QMainWindow):
         self.message_label.hide()
         self.video_player.video_widget.show()
         if self.current_video_index < len(self.video_list):
-            try:
-                for i in self.video_data:
-                    # current_video_data = self.video_data[self.current_video_index]
-                    current_video_data = i
-                    video_filename = current_video_data['serverfilename']
-                    local_video_path = os.path.join(LOADED_VIDEOS_PATH, video_filename)
-                    
-                    self.video_player.show_local_video(local_video_path)
-    
-                # prev_video_filename = self.video_data[self.current_video_index - 1]['serverfilename'] if self.current_video_index > 0 else None
-                # if prev_video_filename:
-                #     service.delete_file(os.path.join(LOADED_VIDEOS_PATH, prev_video_filename))
-                # self.logs["app.play_next_video"] = "Видео успешно загружено."
-            except Exception as e:
-                self.logs["app.play_next_video"] = f"Ошибка при загрузке видео: {e}"
+            local_video_path = './assets/videos/' + self.video_list[self.current_video_index]
+            self.video_player.show_local_video(local_video_path)
             self.current_video_index += 1
-
+        else:
+            self.current_video_index = 0
+            self.load_videos(self.video_data)
+            
     def fade_out_video(self):
         self.show_qr_code()
 
@@ -117,9 +116,9 @@ class App(QMainWindow):
                 equip_id = service.get_param_from_config('config.ini', 'PN')
                 equip_ip = "192.168.1.1"
                 url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat=40&gpslon=40"
-                qr = qrcode.QRCode( 
+                qr = qrcode.QRCode(  # type: ignore
                     version=1,
-                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L, # type: ignore
                     box_size=10,
                     border=4,
                 )

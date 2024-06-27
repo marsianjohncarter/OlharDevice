@@ -3,20 +3,15 @@ from services import Services
 from application import App
 from PyQt5.QtWidgets import QApplication
 import logging
-
 BASE_URL = 'https://api.olhar.media/'
 
 service = Services()
 
-logging.basicConfig(filename="main.log",
-                    format='%(asctime)s %(message)s',
-                    filemode='w')
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
+logger = service.get_logger('main')
 
 def main():
     try:
+        logger.info('Fetching script...')
         script = service.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
         if script:
             if service.is_valid_bash(script):
@@ -35,6 +30,7 @@ def main():
         logger.error(e)
 
     try:
+
         return service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
     except Exception as e:
         logger.error(e)
