@@ -15,18 +15,18 @@ class Services:
     def run_bash(self, script_path):
         try:
             subprocess.run(["bash", script_path], capture_output=True)
-            self.logs["service.run_bash"] = "Скрипт выполнен успешно."
+            self.logger.info('Script executed successfully')
         except subprocess.CalledProcessError as e:
-            self.logs["service.run_bash"] = f"Ошибка при выполнении bash скрипта: {e}"
+            self.logger.error(f'Error running bash script: {e}')
 
     def run_python(self, script_path):
         try:
             with open(script_path, 'r') as f:
                 script = f.read()
             exec(script)
-            self.logs["service.run_python"] = "Скрипт выполнен успешно."
+            self.logger.info('Script executed successfully')
         except Exception as e:
-            self.logs["service.run_python"] = f"Ошибка при выполнении python скрипта: {e}"
+            self.logger.error(f'Error running python script: {e}')
             
     def fetch_json(self, url):
         response = requests.get(url)
@@ -35,7 +35,9 @@ class Services:
             try:
                 return response.json()
             except ValueError:
+                self.logger.critical(f'Error loading JSON: {response.status_code}')
                 return response.status_code
+        self.logger.critical(f'Error loading JSON: {response.status_code}')
         return None
 
     def fetch_script(self, url):
