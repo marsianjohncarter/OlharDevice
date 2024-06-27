@@ -7,6 +7,8 @@ import requests
 from services import Services
 from video_player import VideoPlayer
 import logging
+
+
 service = Services()
 
 BASE_URL = 'https://api.olhar.media/'
