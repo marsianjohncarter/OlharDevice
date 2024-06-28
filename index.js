@@ -42,6 +42,40 @@ let parentArr = [
     ],
 ];
 
+const testArr = [
+    [  
+        {'test':1},
+        {'test2':2},
+        {'test3':3}
+    ],
+    [  
+        {'test':1},
+        {'test422':2},
+        {'test533':3}
+    ]
+]
+
+for (i in testArr) {
+    if (testArr[i + 1]) {
+        for (j in testArr[i]) {
+            if (testArr[i + 1].find(testArr[i][j])) {
+                // return true;
+                console.log('true: ' + j);
+            } 
+        }
+        // return false;
+        console.log('false');
+        
+    } else {
+        // return false;
+        console.log('false');
+
+    }
+}
+
+
+
+
 
 
 function compareArrays(array1, array2) {
@@ -100,5 +134,5 @@ function pushMatchingToEnd(parentArray) {
     }
 }
 
-pushMatchingToEnd(parentArr);
-console.log(parentArr);
+// pushMatchingToEnd(parentArr);
+// console.log(parentArr);

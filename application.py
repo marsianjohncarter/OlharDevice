@@ -13,7 +13,7 @@ service = Services()
 
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
-LOADED_VIDEOS_PATH = "./assets/videos/"
+ASSETS_FOLDER = "./assets"
 
 
 logger = service.get_logger('application')
@@ -83,7 +83,7 @@ class App(QMainWindow):
 
     def load_videos(self, video_data):
         for i in self.video_data:
-            local_video_path = os.path.join(LOADED_VIDEOS_PATH, i['serverfilename'])
+            local_video_path = os.path.join(f'{ASSETS_FOLDER}/videos/', i['serverfilename'])
             if not os.path.exists(local_video_path):
                 self.download_video(BASE_URL + "videos/"+ i['serverfilename'], local_video_path)
             else:
@@ -127,8 +127,8 @@ class App(QMainWindow):
                 qr.add_data(url)
                 qr.make(fit=True)
                 img = qr.make_image(fill='black', back_color='white')
-                img.save('qr_code.png')
-                pixmap = QPixmap('qr_code.png')
+                img.save(f'{ASSETS_FOLDER}/images/qr_code.png')
+                pixmap = QPixmap(f'{ASSETS_FOLDER}/images/qr_code.png')
                 self.qr_code_label.setPixmap(pixmap)
                 self.qr_code_label.show()
                 self.message_label.show()

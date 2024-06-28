@@ -1,9 +1,9 @@
-2024-06-27 13:42:30,822      main   INFO  Fetching script...
-2024-06-27 13:42:30,823  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
-2024-06-27 13:42:31,654  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
-2024-06-27 13:42:31,655  services   INFO  Script loaded successfully
-2024-06-27 13:42:31,659      main  ERROR  [WinError 2] The system cannot find the file specified
-2024-06-27 13:42:31,659  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
-2024-06-27 13:42:32,282  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
-2024-06-27 13:42:32,495  application   INFO  Video sample720_1.mkv already downloaded.
-2024-06-27 13:42:32,495  application   INFO  Video sample720_2.mp4 already downloaded.
+2024-06-28 12:29:54,977      main   INFO  Fetching script...
+2024-06-28 12:29:54,978  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-28 12:29:56,156  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-06-28 12:29:56,156  services   INFO  Script loaded successfully
+2024-06-28 12:29:56,160      main  ERROR  [WinError 2] The system cannot find the file specified
+2024-06-28 12:29:56,161  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-28 12:29:56,781  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-06-28 12:29:57,003  application   INFO  Video sample720_1.mkv already downloaded.
+2024-06-28 12:29:57,003  application   INFO  Video sample720_2.mp4 already downloaded.
