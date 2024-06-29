@@ -11,7 +11,7 @@ class VideoPlayer(QWidget):
         super().__init__()
         self.setWindowTitle("Видеоплеер")
         self.setGeometry(100, 100, 800, 600)
-        self.layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout(self) # type: ignore
         self.video_widget = QVideoWidget(self)
         self.layout.addWidget(self.video_widget)
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -29,4 +29,4 @@ class VideoPlayer(QWidget):
 
     def check_status(self, status):
         if status == QMediaPlayer.EndOfMedia:
-            self.finished.emit()
+            self.finished.emit() # type: ignore

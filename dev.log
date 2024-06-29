@@ -1,9 +1,6 @@
-2024-06-28 12:29:54,977      main   INFO  Fetching script...
-2024-06-28 12:29:54,978  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
-2024-06-28 12:29:56,156  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
-2024-06-28 12:29:56,156  services   INFO  Script loaded successfully
-2024-06-28 12:29:56,160      main  ERROR  [WinError 2] The system cannot find the file specified
-2024-06-28 12:29:56,161  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
-2024-06-28 12:29:56,781  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
-2024-06-28 12:29:57,003  application   INFO  Video sample720_1.mkv already downloaded.
-2024-06-28 12:29:57,003  application   INFO  Video sample720_2.mp4 already downloaded.
+2024-06-28 13:35:19,447  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-06-28 13:35:19,592  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-06-28 13:35:19,592  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-06-28 13:35:19,592     geopy  DEBUG  Nominatim.reverse: https://nominatim.openstreetmap.org/reverse?lat=50.0&lon=40.0&format=json&addressdetails=1
+2024-06-28 13:35:19,593  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-06-28 13:35:19,976  urllib3.connectionpool  DEBUG  https://nominatim.openstreetmap.org:443 "GET /reverse?lat=50.0&lon=40.0&format=json&addressdetails=1 HTTP/1.1" 200 1332

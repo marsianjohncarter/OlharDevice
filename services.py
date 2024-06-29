@@ -5,7 +5,7 @@ import configparser
 import geocoder
 import ast
 import logging
-
+from geopy.geocoders import Nominatim
 
 class Services:
     def __init__(self):
@@ -109,3 +109,21 @@ class Services:
                             filemode='w')
         return logging.getLogger(name)
 
+
+    def get_city_from_coordinates(self, latitude, longitude):
+        geoLoc = Nominatim(user_agent="GetLoc")
+
+        loc = self.get_lat_lon()
+        locname = geoLoc.reverse(f'50.0 40.0')
+        address = locname.raw['address']
+        print(address)
+
+    # latitude, longitude = get_current_location()
+    # if latitude and longitude:
+    #     city = get_city_from_coordinates(latitude, longitude)
+    #     if city:
+    #         print(f"The current city is: {city}")
+    #     else:
+    #         print("Could not determine the city.")
+    # else:
+    #     print("Could not determine the current location.")

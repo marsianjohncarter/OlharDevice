@@ -14,14 +14,12 @@ service = Services()
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
+CURRENT_CITY = service.get_city_from_coordinates(*service.get_lat_lon())
 
 
 logger = service.get_logger('application')
+logger.info(f'Current city: {CURRENT_CITY}')
 
-
-class Second(QMainWindow):
-    def __init__(self, parent=None):
-        super(App).__init__(parent)
 
 class App(QMainWindow):
     def __init__(self):
@@ -30,7 +28,7 @@ class App(QMainWindow):
         self.showFullScreen()
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget) # type: ignore
         self.video_player = VideoPlayer()
         self.layout.addWidget(self.video_player)
         self.message_label = QLabel("Воспользуйтесь Вашим предложением прямо сейчас!", self)
@@ -58,7 +56,7 @@ class App(QMainWindow):
                 "app.play_next_video": "",
                 "app.show_qr_code": "",
             }
-        self.video_player.finished.connect(self.fade_out_video)
+        self.video_player.finished.connect(self.fade_out_video) # type: ignore
 
     def download_video(self, url, local_video_path: str):
         response = requests.get(url, stream=True)
