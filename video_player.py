@@ -12,9 +12,9 @@ class VideoPlayer(QWidget):
         self.setWindowTitle("Видеоплеер")
         self.setGeometry(100, 100, 800, 600)
         self.layout = QVBoxLayout(self) # type: ignore
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.video_widget = QVideoWidget(self)
         self.layout.addWidget(self.video_widget)
-        self.layout.setContentsMargins(0, 0, 0, 0)
         self.media_player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.media_player.setVideoOutput(self.video_widget)
         self.media_player.mediaStatusChanged.connect(self.check_status)

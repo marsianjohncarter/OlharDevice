@@ -1,6 +1,17 @@
-2024-06-28 13:35:19,447  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
-2024-06-28 13:35:19,592  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
-2024-06-28 13:35:19,592  geocoder.base   INFO  Requested http://ipinfo.io/json
-2024-06-28 13:35:19,592     geopy  DEBUG  Nominatim.reverse: https://nominatim.openstreetmap.org/reverse?lat=50.0&lon=40.0&format=json&addressdetails=1
-2024-06-28 13:35:19,593  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
-2024-06-28 13:35:19,976  urllib3.connectionpool  DEBUG  https://nominatim.openstreetmap.org:443 "GET /reverse?lat=50.0&lon=40.0&format=json&addressdetails=1 HTTP/1.1" 200 1332
+2024-06-29 16:31:01,508  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-06-29 16:31:01,641  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-06-29 16:31:01,642  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-06-29 16:31:01,781  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-06-29 16:31:01,781  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-06-29 16:31:01,782  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-06-29 16:31:01,878  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-06-29 16:31:01,878  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-06-29 16:31:01,879     geopy  DEBUG  Nominatim.reverse: https://nominatim.openstreetmap.org/reverse?lat=50.0&lon=40.0&format=json&addressdetails=1
+2024-06-29 16:31:01,879  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
+2024-06-29 16:31:02,166  urllib3.connectionpool  DEBUG  https://nominatim.openstreetmap.org:443 "GET /reverse?lat=50.0&lon=40.0&format=json&addressdetails=1 HTTP/1.1" 200 1332
+2024-06-29 16:31:02,168  application   INFO  Current city: None
+2024-06-29 16:31:02,177      main   INFO  Fetching video data...
+2024-06-29 16:31:02,178  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-29 16:31:03,224  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-06-29 16:31:03,449  application   INFO  Video sample720_1.mkv already downloaded.
+2024-06-29 16:31:03,449  application   INFO  Video sample720_2.mp4 already downloaded.

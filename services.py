@@ -115,7 +115,7 @@ class Services:
 
         loc = self.get_lat_lon()
         locname = geoLoc.reverse(f'50.0 40.0')
-        address = locname.raw['address']
+        address = locname.raw['address']['village'] # type: ignore
         print(address)
 
     # latitude, longitude = get_current_location()
