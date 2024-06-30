@@ -5,7 +5,7 @@ import configparser
 import geocoder
 import ast
 import logging
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
 
 class Services:
     def __init__(self):
@@ -110,20 +110,15 @@ class Services:
         return logging.getLogger(name)
 
 
-    def get_city_from_coordinates(self, latitude, longitude):
-        geoLoc = Nominatim(user_agent="GetLoc")
+    def get_current_city(self):
 
-        loc = self.get_lat_lon()
-        locname = geoLoc.reverse(f'50.0 40.0')
-        address = locname.raw['address']
-        print(address)
+        geolocator = Photon(user_agent="measurements")
 
-    # latitude, longitude = get_current_location()
-    # if latitude and longitude:
-    #     city = get_city_from_coordinates(latitude, longitude)
-    #     if city:
-    #         print(f"The current city is: {city}")
-    #     else:
-    #         print("Could not determine the city.")
-    # else:
-    #     print("Could not determine the current location.")
+        location = self.get_lat_lon()
+
+        Latitude = f"50.0"
+        Longitude = f"40.0"
+        
+        location = geolocator.reverse(Latitude+","+Longitude)
+
+        print(location.raw['properties']['name']) # type: ignore

@@ -1,6 +1,14 @@
-2024-06-28 13:35:19,447  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
-2024-06-28 13:35:19,592  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
-2024-06-28 13:35:19,592  geocoder.base   INFO  Requested http://ipinfo.io/json
-2024-06-28 13:35:19,592     geopy  DEBUG  Nominatim.reverse: https://nominatim.openstreetmap.org/reverse?lat=50.0&lon=40.0&format=json&addressdetails=1
-2024-06-28 13:35:19,593  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
-2024-06-28 13:35:19,976  urllib3.connectionpool  DEBUG  https://nominatim.openstreetmap.org:443 "GET /reverse?lat=50.0&lon=40.0&format=json&addressdetails=1 HTTP/1.1" 200 1332
+2024-06-30 14:10:04,328  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-06-30 14:10:04,328  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-06-30 14:10:04,330  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-06-30 14:10:04,471  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-06-30 14:10:04,471  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-06-30 14:10:04,472     geopy  DEBUG  Photon.reverse: https://photon.komoot.io/reverse?lat=50.0&lon=40.0&limit=1
+2024-06-30 14:10:04,472  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): photon.komoot.io:443
+2024-06-30 14:10:05,303  urllib3.connectionpool  DEBUG  https://photon.komoot.io:443 "GET /reverse?lat=50.0&lon=40.0&limit=1 HTTP/1.1" 200 None
+2024-06-30 14:10:05,305  application   INFO  Current city: None
+2024-06-30 14:10:05,314      main   INFO  Fetching video data...
+2024-06-30 14:10:05,315  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-06-30 14:10:06,522  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-06-30 14:10:06,737  application   INFO  Video sample720_1.mkv already downloaded.
+2024-06-30 14:10:06,737  application   INFO  Video sample720_2.mp4 already downloaded.

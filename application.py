@@ -1,20 +1,20 @@
 import os
+import time
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, pyqtSignal
 from PyQt5.QtGui import QPixmap
 import qrcode
 import requests
 from services import Services
 from video_player import VideoPlayer
-import logging
-
+from diagnostic_menu import Menu
 
 service = Services()
 
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
-CURRENT_CITY = service.get_city_from_coordinates(*service.get_lat_lon())
+CURRENT_CITY = service.get_current_city()
 
 
 logger = service.get_logger('application')
@@ -22,21 +22,29 @@ logger.info(f'Current city: {CURRENT_CITY}')
 
 
 class App(QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Видеоплеер")
         self.showFullScreen()
+
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
+
         self.layout = QVBoxLayout(self.central_widget) # type: ignore
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
         self.video_player = VideoPlayer()
+
         self.layout.addWidget(self.video_player)
+
         self.message_label = QLabel("Воспользуйтесь Вашим предложением прямо сейчас!", self)
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setStyleSheet("font-size: 60px;")
         self.message_label.hide()
+
         self.layout.addWidget(self.message_label)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        
         self.qr_code_label = QLabel(self)
         self.qr_code_label.setAlignment(Qt.AlignCenter)
         self.qr_code_label.setStyleSheet("""
@@ -47,16 +55,21 @@ class App(QMainWindow):
         """)
         self.qr_code_label.hide()
         self.layout.addWidget(self.qr_code_label, 0, Qt.AlignBottom)
+
         self.current_video_index = 0
         self.video_list = []
         self.video_data = []
+        self.menu_window = None
+
         self.logs = {
                 "app.load_video_data": "",
                 "app.load_videos": "",
                 "app.play_next_video": "",
                 "app.show_qr_code": "",
             }
+        
         self.video_player.finished.connect(self.fade_out_video) # type: ignore
+
 
     def download_video(self, url, local_video_path: str):
         response = requests.get(url, stream=True)
@@ -88,7 +101,14 @@ class App(QMainWindow):
                 logger.info(f"Video {i['serverfilename']} already downloaded.")
 
 
-        self.video_list = [video['serverfilename'] for video in video_data]
+        self.video_list = []
+        for video in video_data:
+            for city in video['locations']:
+                if city['city'] == CURRENT_CITY:
+                    self.video_list.append(video['serverfilename'])
+                else:
+                    pass
+                
         if self.video_list:
             self.play_next_video()
 
@@ -148,3 +168,17 @@ class App(QMainWindow):
                 self.logs["app.show_qr_code"] = "QR-код и сообщение успешно отображены."
         except Exception as e:
             self.logs["app.show_qr_code"] = f"Ошибка при отображении QR-кода и сообщения: {e}"
+
+    def keyPressEvent(self, qKeyEvent):
+        if qKeyEvent.key() == Qt.Key_Space: 
+            self.openMenu()
+        else:
+            super().keyPressEvent(qKeyEvent)
+    
+    def openMenu(self):
+        if not self.menu_window:
+            self.menu_window = Menu()
+            self.menu_window.show()
+            self.menu_window.updateMenu()
+        else:
+            self.menu_window.show()

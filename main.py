@@ -10,6 +10,11 @@ service = Services()
 
 logger = service.get_logger('main')
 
+
+
+
+
+
 def main():
     # try:
     #     logger.info('Fetching script...')
@@ -46,17 +51,3 @@ if __name__ == "__main__":
     app.exec_()
 
 
-# importing modules
-from geopy.geocoders import Nominatim
-from services import Services
-# calling the nominatim tool
-geoLoc = Nominatim(user_agent="GetLoc")
-service = Services()
-
-loc = service.get_lat_lon()
-# passing the coordinates
-locname = geoLoc.reverse(f'50.0 40.0')
-# locname = geoLoc.reverse(f'{loc[0]} {loc[1]}')
-address = locname.raw['address']
-# printing the address/location name
-print(address)
