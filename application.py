@@ -108,7 +108,7 @@ class App(QMainWindow):
                     self.video_list.append(video['serverfilename'])
                 else:
                     pass
-                
+
         if self.video_list:
             self.play_next_video()
 
