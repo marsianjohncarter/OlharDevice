@@ -12,6 +12,8 @@ logger = service.get_logger('main')
 
 
 
+service.get_current_city()
+
 
 
 
@@ -44,6 +46,8 @@ def main():
 if __name__ == "__main__":
     app = QApplication([])
     video_data = main()
+    print(video_data)
+
     w = App()
     w.load_video_data(video_data)
     w.load_videos(video_data)

@@ -86,11 +86,8 @@ class App(QMainWindow):
             logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
     def load_video_data(self, video_data):
-        try:
-            self.video_data = video_data
-            self.logs["app.load_video_data"] = "Список видео успешно загружен."
-        except Exception as e:
-            self.logs["app.load_video_data"] = f"Ошибка при загрузке списка видео: {e}"
+        self.video_data = video_data
+        service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
 
     def load_videos(self, video_data):
         for i in self.video_data:
@@ -104,13 +101,16 @@ class App(QMainWindow):
         self.video_list = []
         for video in video_data:
             for city in video['locations']:
-                if city['city'] == CURRENT_CITY:
+                print(city)
+                if city['enname'] == CURRENT_CITY:
                     self.video_list.append(video['serverfilename'])
                 else:
                     pass
 
         if self.video_list:
             self.play_next_video()
+        else:
+            logger.critical(f"No videos found for city {CURRENT_CITY}.")
 
     def play_next_video(self):
         self.qr_code_label.hide()

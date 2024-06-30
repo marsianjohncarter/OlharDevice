@@ -12,6 +12,47 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLab
 import shutil
 import psutil 
 
+ASSETS_FOLDER = "./assets"
+
+
+class dataWindow(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Logs')
+        self.setGeometry(400, 400, 700, 500)
+        self.setStyleSheet("background-color: black;") 
+
+        self.data = 'None'
+        self.openData(f'{ASSETS_FOLDER}/data/video_data.json')
+
+        self.json_label = QLabel(text=f'{self.data}')
+        self.json_label.setStyleSheet('color: white')
+
+        self.update_data_btn = QPushButton(text='Update data')
+        self.update_data_btn.clicked.connect(lambda: self.updateJsonLabel(f'{ASSETS_FOLDER}/data/video_data.json'))
+        self.update_data_btn.setStyleSheet('background-color: white')
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.addWidget(self.update_data_btn)
+        layout.addWidget(self.json_label)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setWidget(widget)
+        self.setWidgetResizable(True)
+
+
+
+    def openData(self, file):
+        with open(file, 'r') as txt:
+            list_of_lines = txt.read() 
+        self.data = list_of_lines
+    
+    def updateJsonLabel(self, file):
+        with open(file, 'r') as txt:
+            list_of_lines = txt.read() 
+        self.json_label.setText(list_of_lines)
 
 class logWindow(QScrollArea):
     def __init__(self):
@@ -62,13 +103,17 @@ class Menu(QMainWindow):
         self.setWindowTitle('Menu')
         self.setGeometry(400, 400, 700, 500)
         self.logs_window = None
+        self.json_window = None
+
         default_font = QFont()
         default_font.setBold(True)
         layout = QVBoxLayout()
 
         
         self.logs_btn = QPushButton(text='Open Logs')
-        self.logs_btn.clicked.connect(self.openLogs)
+        self.logs_btn.clicked.connect(self.openLogs)        
+        self.json_btn = QPushButton(text='Open Company Data')
+        self.json_btn.clicked.connect(self.openJson)
         storage_info = self.getStorageInfo()
         self.storage_label = QLabel(text=f'Storage: \nTotal: {storage_info["total"]}GB | Used: {storage_info["used"]}GB | Free: {storage_info["free"]}GB')
         self.storage_label.setStyleSheet("font-size: 15px;")
@@ -83,6 +128,7 @@ class Menu(QMainWindow):
         self.updateBtn = QPushButton(text='Update Menu')
         self.updateBtn.clicked.connect(self.updateMenu)
 
+        layout.addWidget(self.json_btn)
         layout.addWidget(self.logs_btn)
         layout.addWidget(self.storage_label)
         layout.addWidget(self.cpu_util_label)
@@ -96,11 +142,11 @@ class Menu(QMainWindow):
         if not self.logs_window:
             self.logs_window = logWindow()
         self.logs_window.show()
-
-    def closeLogs(self):
-        if self.logs_window:
-            self.logs_window.hide()
-        self.logs_window = None
+    
+    def openJson(self):
+        if not self.json_window:
+            self.json_window = dataWindow()
+        self.json_window.show()
 
     def getStorageInfo(self):
         total, used, free = shutil.disk_usage("/")

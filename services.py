@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import subprocess
@@ -110,15 +111,20 @@ class Services:
         return logging.getLogger(name)
 
 
+    def save_json(self, dictionary, path: str):
+        json_object = json.dumps(dictionary, indent=4)
+        with open(f"{path}", "w") as outfile:
+            outfile.write(json_object)
+
     def get_current_city(self):
 
         geolocator = Photon(user_agent="measurements")
 
-        location = self.get_lat_lon()
+        location_lat_lon = self.get_lat_lon()
 
-        Latitude = f"50.0"
-        Longitude = f"40.0"
+        Latitude = f"{location_lat_lon[0]}"
+        Longitude = f"{location_lat_lon[1]}"
         
         location = geolocator.reverse(Latitude+","+Longitude)
 
-        print(location.raw['properties']['name']) # type: ignore
+        return location
