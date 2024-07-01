@@ -101,7 +101,6 @@ class Services:
             except PermissionError:
                 self.logger.error(f'Error deleting file: {path}')
 
-
     def get_logger(self, name):
         log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'
         logging.basicConfig(level=logging.DEBUG,
@@ -109,7 +108,6 @@ class Services:
                             filename='dev.log',
                             filemode='w')
         return logging.getLogger(name)
-
 
     def save_json(self, dictionary, path: str):
         json_object = json.dumps(dictionary, indent=4)

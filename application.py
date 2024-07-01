@@ -135,7 +135,8 @@ class App(QMainWindow):
                 video_id = current_video_data['id']
                 equip_id = service.get_param_from_config('config.ini', 'PN')
                 equip_ip = "192.168.1.1"
-                url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat=40&gpslon=40"
+                lat_and_lon = service.get_lat_lon()
+                url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat={lat_and_lon[0]}&gpslon={lat_and_lon[1]}"
                 qr = qrcode.QRCode(  # type: ignore
                     version=1,
                     error_correction=qrcode.constants.ERROR_CORRECT_L, # type: ignore
