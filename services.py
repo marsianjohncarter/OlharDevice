@@ -31,15 +31,16 @@ class Services:
             
     def fetch_json(self, url):
         response = requests.get(url)
-        if (response.status_code != 204 and response.status_code < 300 and
+        if not (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
-            try:
-                return response.json()
-            except ValueError:
-                self.logger.critical(f'Error loading JSON: {response.status_code}')
-                return response.status_code
-        self.logger.critical(f'Error loading JSON: {response.status_code}')
-        return None
+            # TODO: Add error handling
+            pass
+        try:
+            return response.json()
+        except ValueError as e:
+            # TODO: find what response looks like
+            raise RuntimeError(f'Failed to parse JSON response: {response}') from e
+
 
     def fetch_script(self, url):
         response = requests.get(url)
@@ -92,14 +93,14 @@ class Services:
     def get_lat_lon(self):
         g = geocoder.ip('me')
         return g.latlng
-
-    def delete_file(self, path):
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-                self.logger.info(f'Deleted file: {path}')
-            except PermissionError:
-                self.logger.error(f'Error deleting file: {path}')
+    # TODO: Check if delete_file is needed
+    # def delete_file(self, path):
+    #     if os.path.exists(path):
+    #         try:
+    #             os.remove(path)
+    #             self.logger.info(f'Deleted file: {path}')
+    #         except PermissionError:
+    #             self.logger.error(f'Error deleting file: {path}')
 
     def get_logger(self, name):
         log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'
@@ -110,9 +111,8 @@ class Services:
         return logging.getLogger(name)
 
     def save_json(self, dictionary, path: str):
-        json_object = json.dumps(dictionary, indent=4)
-        with open(f"{path}", "w") as outfile:
-            outfile.write(json_object)
+        with open(path, "w") as outfile:
+            json.dump(dictionary, outfile, indent=4)
 
     def get_current_city(self):
 

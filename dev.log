@@ -1,22 +1,104 @@
-2024-06-30 19:00:04,964  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
-2024-06-30 19:00:04,964  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
-2024-06-30 19:00:04,967  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
-2024-06-30 19:00:05,097  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
-2024-06-30 19:00:05,097  geocoder.base   INFO  Requested http://ipinfo.io/json
-2024-06-30 19:00:05,098     geopy  DEBUG  Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
-2024-06-30 19:00:05,099  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): photon.komoot.io:443
-2024-06-30 19:00:06,083  urllib3.connectionpool  DEBUG  https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
-2024-06-30 19:00:06,085  application   INFO  Current city: Rio Linda, 95673, California, United States
-2024-06-30 19:00:06,092  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
-2024-06-30 19:00:06,092  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
-2024-06-30 19:00:06,093  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
-2024-06-30 19:00:06,188  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
-2024-06-30 19:00:06,188  geocoder.base   INFO  Requested http://ipinfo.io/json
-2024-06-30 19:00:06,189     geopy  DEBUG  Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
-2024-06-30 19:00:06,189  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): photon.komoot.io:443
-2024-06-30 19:00:07,087  urllib3.connectionpool  DEBUG  https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
-2024-06-30 19:00:07,132      main   INFO  Fetching video data...
-2024-06-30 19:00:07,133  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
-2024-06-30 19:00:08,542  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
-2024-06-30 19:00:08,887  application   INFO  Video sample720_1.mkv already downloaded.
-2024-06-30 19:00:08,887  application   INFO  Video sample720_2.mp4 already downloaded.
+2024-07-02 14:18:08,278  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:18:08,278  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:18:08,283  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:18:08,424  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:18:08,425  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-07-02 14:18:08,426     geopy  DEBUG  Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:18:08,426  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:18:09,381  urllib3.connectionpool  DEBUG  https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:18:09,384      main   INFO  Fetching script...
+2024-07-02 14:18:09,385  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:18:10,779  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-07-02 14:18:10,780  services   INFO  Script loaded successfully
+2024-07-02 14:18:10,780      main  ERROR  __init__() got an unexpected keyword argument 'capture_output'
+2024-07-02 14:18:10,780      main   INFO  Fetching video data...
+2024-07-02 14:18:10,781  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:18:11,633  urllib3.connectionpool  DEBUG  https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-07-02 14:18:11,737  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:18:11,737  urllib3.util.retry  DEBUG  Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:18:11,738  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:18:11,852  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:18:11,852  geocoder.base   INFO  Requested http://ipinfo.io/json
+2024-07-02 14:18:11,853     geopy  DEBUG  Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:18:11,853  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:18:12,586  urllib3.connectionpool  DEBUG  https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:18:12,587  application   INFO  Current city: Rio Linda, 95673, California, United States
+2024-07-02 14:27:56,615 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:27:56,615 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:27:56,617 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:27:56,772 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:27:56,772 INFO Requested http://ipinfo.io/json
+2024-07-02 14:27:56,773 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:27:56,773 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:27:58,001 DEBUG https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:27:58,002 INFO Fetching script...
+2024-07-02 14:27:58,003 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:27:59,469 DEBUG https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-07-02 14:27:59,470 INFO Script loaded successfully
+2024-07-02 14:27:59,470 ERROR __init__() got an unexpected keyword argument 'capture_output'
+2024-07-02 14:27:59,470 INFO Fetching video data...
+2024-07-02 14:27:59,471 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:28:00,313 DEBUG https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-07-02 14:28:00,383 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:00,383 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:00,384 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:28:00,511 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:28:00,511 INFO Requested http://ipinfo.io/json
+2024-07-02 14:28:00,512 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:28:00,512 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:28:02,109 DEBUG Incremented Retry for (url='/reverse?lat=38.691&lon=-121.4486&limit=1'): Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:02,109 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='photon.komoot.io', port=443): Read timed out. (read timeout=1)",)': /reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:28:02,109 DEBUG Starting new HTTPS connection (2): photon.komoot.io:443
+2024-07-02 14:28:03,714 DEBUG Incremented Retry for (url='/reverse?lat=38.691&lon=-121.4486&limit=1'): Retry(total=0, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:03,714 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='photon.komoot.io', port=443): Read timed out. (read timeout=1)",)': /reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:28:03,715 DEBUG Starting new HTTPS connection (3): photon.komoot.io:443
+2024-07-02 14:28:27,686 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:27,686 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:27,688 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:28:27,838 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:28:27,838 INFO Requested http://ipinfo.io/json
+2024-07-02 14:28:27,838 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:28:27,839 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:28:29,398 DEBUG https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:28:29,400 INFO Fetching script...
+2024-07-02 14:28:29,401 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:28:30,857 DEBUG https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-07-02 14:28:30,858 INFO Script loaded successfully
+2024-07-02 14:28:30,858 ERROR __init__() got an unexpected keyword argument 'capture_output'
+2024-07-02 14:28:30,858 INFO Fetching video data...
+2024-07-02 14:28:30,859 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:28:31,714 DEBUG https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-07-02 14:28:31,779 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:31,780 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:28:31,781 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:28:31,900 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:28:31,900 INFO Requested http://ipinfo.io/json
+2024-07-02 14:28:31,900 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:28:31,901 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:28:33,301 DEBUG https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:28:33,303 INFO Current city: Rio Linda, 95673, California, United States
+2024-07-02 14:30:27,170 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:30:27,170 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:30:27,173 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:30:27,318 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:30:27,319 INFO Requested http://ipinfo.io/json
+2024-07-02 14:30:27,320 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:30:27,320 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:30:28,274 DEBUG https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:30:28,276 INFO Fetching script...
+2024-07-02 14:30:28,277 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:30:29,352 DEBUG https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+2024-07-02 14:30:29,354 INFO Script loaded successfully
+2024-07-02 14:30:29,354 ERROR __init__() got an unexpected keyword argument 'capture_output'
+2024-07-02 14:30:29,354 INFO Fetching video data...
+2024-07-02 14:30:29,355 DEBUG Starting new HTTPS connection (1): api.olhar.media:443
+2024-07-02 14:30:30,203 DEBUG https://api.olhar.media:443 "GET /?getvideos&equipid=1 HTTP/1.1" 200 559
+2024-07-02 14:30:30,272 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:30:30,272 DEBUG Converted retries value: 2 -> Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2024-07-02 14:30:30,273 DEBUG Starting new HTTP connection (1): ipinfo.io:80
+2024-07-02 14:30:30,389 DEBUG http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
+2024-07-02 14:30:30,390 INFO Requested http://ipinfo.io/json
+2024-07-02 14:30:30,390 DEBUG Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
+2024-07-02 14:30:30,391 DEBUG Starting new HTTPS connection (1): photon.komoot.io:443
+2024-07-02 14:30:31,139 DEBUG https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+2024-07-02 14:30:31,141 INFO Current city: Rio Linda, 95673, California, United States

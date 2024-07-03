@@ -8,16 +8,27 @@ BASE_URL = 'https://api.olhar.media/'
 
 service = Services()
 
+current_city = service.get_current_city()
 logger = service.get_logger('main')
 
 
 
-service.get_current_city()
+# def filter_video_data(video_data):
+#     new_video_data = []
+#     for i in video_data:
+#         if 'locations' not in i:
+#             logger.error(f"Video object {i} has no 'locations' attribute.")
+#             continue
+#         for city in i['locations']:
+#             if 'enname' not in city:
+#                 logger.error(f"City object {city} has no 'enname' attribute.")
+#                 continue
+#             if city['enname'] == current_city:
+#                 new_video_data.append(i)
+#     return new_video_data
 
 
-
-
-def main():
+def run_maintenance_script():
     try:
         logger.info('Fetching script...')
         script = service.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
@@ -37,21 +48,27 @@ def main():
     except Exception as e:
         logger.error(e)
 
+
+
+def main():
+    run_maintenance_script()
+
     try:   
         logger.info('Fetching video data...')
-        return service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
+        video_data = service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
     except Exception as e:
-        logger.error(e)
-
-if __name__ == "__main__":
+        logger.critical(e)
+        raise e
     app = QApplication([])
-    video_data = main()
-    print(video_data)
-
     w = App()
-    w.load_video_data(video_data)
+    w.set_video_data(video_data)
     w.load_videos(video_data)
+    # w.set_video_data(filter_video_data(video_data))
+    # w.load_videos(filter_video_data(video_data))
     w.show()
     app.exec_()
+
+if __name__ == "__main__":
+    main()
 
 

@@ -1,7 +1,7 @@
 import os
 import time
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, pyqtSignal
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, pyqtSignal, QTime
 from PyQt5.QtGui import QPixmap
 import qrcode
 import requests
@@ -9,16 +9,12 @@ from services import Services
 from video_player import VideoPlayer
 from diagnostic_menu import Menu
 
-service = Services()
 
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
-CURRENT_CITY = service.get_current_city()
 
 
-logger = service.get_logger('application')
-logger.info(f'Current city: {CURRENT_CITY}')
 
 
 class App(QMainWindow):
@@ -27,6 +23,12 @@ class App(QMainWindow):
         super().__init__()
         self.setWindowTitle("Видеоплеер")
         self.showFullScreen()
+
+        self.service = Services()
+        self.current_city = self.service.get_current_city()
+
+        self.logger = self.service.get_logger('application')
+        self.logger.info(f'Current city: {self.current_city}')
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -72,45 +74,34 @@ class App(QMainWindow):
 
 
     def download_video(self, url, local_video_path: str):
+        # TODO: Add logic to check if video is fully downlaoded
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            logger.info(f"Downloading video {local_video_path}...")
+            self.logger.info(f"Downloading video {local_video_path}...")
             try:
-                with open(f"{local_video_path}", "wb") as file:
+                with open(f"{local_video_path}.dat.incomplete", "wb") as file:
                     for chunk in response.iter_content(chunk_size=1024*1024):
                         file.write(chunk)
-                logger.info(f"Video {local_video_path} downloaded successfully")
+                os.rename(f"{local_video_path}.dat.incomplete", local_video_path)
+                self.logger.info(f"Video {local_video_path} downloaded successfully")
             except Exception as e:
-                logger.critical(f"Video could not be downloaded. Error: {e}")
+                self.logger.critical(f"Video could not be downloaded. Error: {e}")
         else:
-            logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
+            self.logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
-    def load_video_data(self, video_data):
+    def set_video_data(self, video_data):
         self.video_data = video_data
-        service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
+        try:
+            self.service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
+        except Exception as e:
+            self.logger.error(e)
 
     def load_videos(self, video_data):
-        for i in self.video_data:
-            local_video_path = os.path.join(f'{ASSETS_FOLDER}/videos/', i['serverfilename'])
-            if not os.path.exists(local_video_path):
-                self.download_video(BASE_URL + "videos/"+ i['serverfilename'], local_video_path)
-            else:
-                logger.info(f"Video {i['serverfilename']} already downloaded.")
-
-
-        self.video_list = []
-        for video in video_data:
-            for city in video['locations']:
-                print(city)
-                if city['enname'] == CURRENT_CITY:
-                    self.video_list.append(video['serverfilename'])
-                else:
-                    pass
-
+        self.video_list = [video['serverfilename'] for video in video_data]
         if self.video_list:
             self.play_next_video()
         else:
-            logger.critical(f"No videos found for city {CURRENT_CITY}.")
+            self.logger.critical(f"No videos found for city {self.current_city}.")
 
     def play_next_video(self):
         self.qr_code_label.hide()
@@ -133,9 +124,9 @@ class App(QMainWindow):
             if self.current_video_index > 0:
                 current_video_data = self.video_data[self.current_video_index - 1]
                 video_id = current_video_data['id']
-                equip_id = service.get_param_from_config('config.ini', 'PN')
+                equip_id = self.service.get_param_from_config('config.ini', 'PN')
                 equip_ip = "192.168.1.1"
-                lat_and_lon = service.get_lat_lon()
+                lat_and_lon = self.service.get_lat_lon()
                 url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat={lat_and_lon[0]}&gpslon={lat_and_lon[1]}"
                 qr = qrcode.QRCode(  # type: ignore
                     version=1,
@@ -180,6 +171,5 @@ class App(QMainWindow):
         if not self.menu_window:
             self.menu_window = Menu()
             self.menu_window.show()
-            self.menu_window.updateMenu()
         else:
-            self.menu_window.show()
+            self.menu_window.hide()

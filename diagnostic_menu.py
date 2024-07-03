@@ -1,20 +1,16 @@
 import os
 from time import sleep
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation
-from PyQt5.QtGui import QPixmap, QFont
-import qrcode
-import requests
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, QTime
+from PyQt5.QtGui import QFont
 from services import Services
-from video_player import VideoPlayer
 import logging
-from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel, QScrollArea
 import shutil
 import psutil 
 
 ASSETS_FOLDER = "./assets"
 
-
+# TODO: Add parent class for all widgets
 class dataWindow(QScrollArea):
     def __init__(self):
         super().__init__()
@@ -154,9 +150,11 @@ class Menu(QMainWindow):
     
     def getCpuInfo(self):
         return f"CPU utilization: {psutil.cpu_percent()}%"
-    
+
     def updateMenu(self):
         storage_info = self.getStorageInfo()
         self.storage_label.setText(f'Storage: \nTotal: {storage_info["total"]}GB | Used: {storage_info["used"]}GB | Free: {storage_info["free"]}GB')
         self.cpu_util_label.setText(f'{self.getCpuInfo()}')
+
+
 
