@@ -1,7 +1,9 @@
+from datetime import date
+import logging
 import os
 import time
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, pyqtSignal, QTime
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation,  QTime
 from PyQt5.QtGui import QPixmap
 import qrcode
 import requests
@@ -14,6 +16,8 @@ BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
 
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
+logger = logging.getLogger('application')
 
 
 
@@ -27,8 +31,7 @@ class App(QMainWindow):
         self.service = Services()
         self.current_city = self.service.get_current_city()
 
-        self.logger = self.service.get_logger('application')
-        self.logger.info(f'Current city: {self.current_city}')
+        logger.info(f'Current city: {self.current_city}')
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -75,33 +78,40 @@ class App(QMainWindow):
 
     def download_video(self, url, local_video_path: str):
         # TODO: Add logic to check if video is fully downlaoded
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True) # type: ignore
         if response.status_code == 200:
-            self.logger.info(f"Downloading video {local_video_path}...")
+            logger.info(f"Downloading video {local_video_path}...")
             try:
                 with open(f"{local_video_path}.dat.incomplete", "wb") as file:
                     for chunk in response.iter_content(chunk_size=1024*1024):
                         file.write(chunk)
                 os.rename(f"{local_video_path}.dat.incomplete", local_video_path)
-                self.logger.info(f"Video {local_video_path} downloaded successfully")
+                logger.info(f"Video {local_video_path} downloaded successfully")
             except Exception as e:
-                self.logger.critical(f"Video could not be downloaded. Error: {e}")
+                logger.critical(f"Video could not be downloaded. Error: {e}")
         else:
-            self.logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
+            logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
     def set_video_data(self, video_data):
         self.video_data = video_data
         try:
             self.service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
         except Exception as e:
-            self.logger.error(e)
+            logger.error(e)
 
     def load_videos(self, video_data):
+        self.video_url_list = [BASE_URL + '/videos/' + video['serverfilename'] for video in video_data]
         self.video_list = [video['serverfilename'] for video in video_data]
+
+        for video_url in self.video_url_list:
+            local_video_path = 'assets/videos/' + self.video_list[self.video_url_list.index(video_url)]
+            if not os.path.exists(local_video_path):
+                self.download_video(video_url, local_video_path)
+                
         if self.video_list:
             self.play_next_video()
         else:
-            self.logger.critical(f"No videos found for city {self.current_city}.")
+            logger.critical(f"No videos found for city {self.current_city}.")
 
     def play_next_video(self):
         self.qr_code_label.hide()
@@ -170,6 +180,12 @@ class App(QMainWindow):
     def openMenu(self):
         if not self.menu_window:
             self.menu_window = Menu()
+            self.menu_window.sig.connect(self.menuClosed) # type: ignore
+
             self.menu_window.show()
         else:
             self.menu_window.hide()
+            self.menu_window = None
+
+    def menuClosed(self):
+        self.menu_window = None

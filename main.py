@@ -2,14 +2,20 @@ import os
 from services import Services
 from application import App
 from PyQt5.QtWidgets import QApplication
-
+import logging
+from datetime import date
 
 BASE_URL = 'https://api.olhar.media/'
 
 service = Services()
 
 current_city = service.get_current_city()
-logger = service.get_logger('main')
+
+
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
+logger = logging.getLogger('main')
+
+logger.setLevel(logging.DEBUG)
 
 
 
@@ -58,7 +64,7 @@ def main():
         video_data = service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
     except Exception as e:
         logger.critical(e)
-        raise e
+        raise RuntimeError('Failed to fetch video data') from e
     app = QApplication([])
     w = App()
     w.set_video_data(video_data)

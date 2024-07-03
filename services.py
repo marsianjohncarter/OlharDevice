@@ -1,3 +1,4 @@
+from datetime import date
 import json
 import os
 import requests
@@ -7,27 +8,38 @@ import geocoder
 import ast
 import logging
 from geopy.geocoders import Photon
+import serial
+
+SERIAL_PORT = "/dev/ttyUSB0"
+running = True
+
+
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log',
+                    filemode='w')
+
+logger = logging.getLogger('services')
+logger.setLevel(logging.DEBUG)
 
 class Services:
     def __init__(self):
-        self.logger = self.get_logger('services')
+
         self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
     def run_bash(self, script_path):
         try:
             subprocess.run(["bash", script_path], capture_output=True)
-            self.logger.info('Script executed successfully')
+            logger.info('Script executed successfully')
         except subprocess.CalledProcessError as e:
-            self.logger.error(f'Error running bash script: {e}')
+            logger.error(f'Error running bash script: {e}')
 
     def run_python(self, script_path):
         try:
             with open(script_path, 'r') as f:
                 script = f.read()
             exec(script)
-            self.logger.info('Script executed successfully')
+            logger.info('Script executed successfully')
         except Exception as e:
-            self.logger.error(f'Error running python script: {e}')
+            logger.error(f'Error running python script: {e}')
             
     def fetch_json(self, url):
         response = requests.get(url)
@@ -38,16 +50,14 @@ class Services:
         try:
             return response.json()
         except ValueError as e:
-            # TODO: find what response looks like
-            raise RuntimeError(f'Failed to parse JSON response: {response}') from e
-
+            raise e
 
     def fetch_script(self, url):
         response = requests.get(url)
         if response.status_code != 204:
-            self.logger.info('Script loaded successfully')
+            logger.info('Script loaded successfully')
             return response.text
-        self.logger.error(f'Error loading script: {response.status_code}')
+        logger.error(f'Error loading script: {response.status_code}')
         return None
 
     def is_valid_python(self, code):
@@ -76,9 +86,9 @@ class Services:
         }
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            self.logger.info('Video view registered successfully')
+            logger.info('Video view registered successfully')
         else:
-            self.logger.error(f'Error registering video view: {response.status_code}')
+            logger.error(f'Error registering video view: {response.status_code}')
 
     def get_param_from_config(self, config_path: str, param_name: str):
         config = configparser.ConfigParser()
@@ -87,20 +97,62 @@ class Services:
             part_number = config['General'][f'{param_name}']
             return part_number
         except FileNotFoundError:
-            self.logger.error(f'Config file not found: {config_path}')
+            logger.error(f'Config file not found: {config_path}')
             return None
 
+    def formatDegreesMinutes(self, coordinates, digits):
+    
+        parts = coordinates.split(".")
+
+        if (len(parts) != 2):
+            return coordinates
+
+        if (digits > 3 or digits < 2):
+            return coordinates
+        
+        left = parts[0]
+        right = parts[1]
+        degrees = str(left[:digits])
+        minutes = str(right[:3])
+
+        return degrees + "." + minutes
+
     def get_lat_lon(self):
-        g = geocoder.ip('me')
-        return g.latlng
+        gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
+        
+        data = gps.readline().decode('utf-8').rstrip()
+        message = data[0:6]
+        # print(message)
+        if (message == "$GNRMC"):
+            # GPRMC = Рекомендуемые минимальные конкретные данные GPS / транзит
+            # Чтение фиксированных данных GPS является альтернативным подходом, 
+            # который также работает
+            parts = data.split(",")
+            print(parts)
+            if parts[2] == 'V':
+                # V = Предупреждение, скорее всего, спутников нет в поле зрения ...
+                print ("GPS receiver warning")
+            else:
+                # Получить данные о местоположении, которые были переданы с сообщением GPRMC. 
+                # В этом примере интересуют только долгота и широта. Для других значений можно
+                # обратиться к http://aprs.gids.nl/nmea/#rmc
+                longitude = self.formatDegreesMinutes(parts[5], 3)
+                latitude = self.formatDegreesMinutes(parts[3], 2)
+                logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
+        else:
+            # Обрабатывать другие сообщения NMEA и неподдерживаемые строки
+            pass
+
+        gps.close()
+        return [latitude, longitude]
     # TODO: Check if delete_file is needed
     # def delete_file(self, path):
     #     if os.path.exists(path):
     #         try:
     #             os.remove(path)
-    #             self.logger.info(f'Deleted file: {path}')
+    #             logger.info(f'Deleted file: {path}')
     #         except PermissionError:
-    #             self.logger.error(f'Error deleting file: {path}')
+    #             logger.error(f'Error deleting file: {path}')
 
     def get_logger(self, name):
         log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'

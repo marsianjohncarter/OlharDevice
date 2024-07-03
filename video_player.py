@@ -3,9 +3,11 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import QUrl, pyqtSignal
 import logging
+from datetime import date
 
+
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
 logger = logging.getLogger('video_player')
-logging.basicConfig(filename='dev.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s') # type: ignore
 
 class VideoPlayer(QWidget):
     finished = pyqtSignal()
@@ -21,14 +23,7 @@ class VideoPlayer(QWidget):
         self.media_player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.media_player.setVideoOutput(self.video_widget)
         self.media_player.mediaStatusChanged.connect(self.check_status)
-
-    def show_video(self, video_url):
-        try:
-            self.media_player.setMedia(QMediaContent(QUrl(video_url)))
-            self.media_player.play()
-        except Exception as e:
-            logger.critical(f"Error playing video: {e}")
-            self.finished.emit() # type: ignore
+        
 
     def show_local_video(self, video_path):
         try:
@@ -36,7 +31,7 @@ class VideoPlayer(QWidget):
             self.media_player.play()
         except Exception as e:
             logger.critical(f"Error playing video: {e}")
-            self.finished.emit() # type: ignore    
+            raise RuntimeError(f"Error playing video: {video_path}") from e
 
     def check_status(self, status):
         if status == QMediaPlayer.EndOfMedia:

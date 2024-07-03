@@ -1,6 +1,6 @@
 import os
 from time import sleep
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, QTime
+from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, QTime, pyqtSignal
 from PyQt5.QtGui import QFont
 from services import Services
 import logging
@@ -94,12 +94,16 @@ class logWindow(QScrollArea):
         self.logs_label.setText(list_of_lines)
 
 class Menu(QMainWindow):
+    sig = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Menu')
         self.setGeometry(400, 400, 700, 500)
         self.logs_window = None
         self.json_window = None
+
+
 
         default_font = QFont()
         default_font.setBold(True)
@@ -133,16 +137,27 @@ class Menu(QMainWindow):
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
+        self.timer = QTimer(self)
+
+        self.timer.timeout.connect(self.updateMenu)
+        self.timer.start(1000)
+        
 
     def openLogs(self):
         if not self.logs_window:
             self.logs_window = logWindow()
-        self.logs_window.show()
+            self.logs_window.show()
+        else:
+            self.logs_window.hide()
+            self.logs_window= None
     
     def openJson(self):
         if not self.json_window:
             self.json_window = dataWindow()
-        self.json_window.show()
+            self.json_window.show()
+        else:
+            self.json_window.hide()
+            self.json_window = None
 
     def getStorageInfo(self):
         total, used, free = shutil.disk_usage("/")
@@ -155,6 +170,9 @@ class Menu(QMainWindow):
         storage_info = self.getStorageInfo()
         self.storage_label.setText(f'Storage: \nTotal: {storage_info["total"]}GB | Used: {storage_info["used"]}GB | Free: {storage_info["free"]}GB')
         self.cpu_util_label.setText(f'{self.getCpuInfo()}')
+    
+    def closeEvent(self, event):
+        self.sig.emit() # type: ignore
 
 
 
