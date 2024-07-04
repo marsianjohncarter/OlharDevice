@@ -1,7 +1,6 @@
 from datetime import date
 import logging
 import os
-import time
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
 from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation,  QTime
 from PyQt5.QtGui import QPixmap
@@ -77,8 +76,7 @@ class App(QMainWindow):
 
 
     def download_video(self, url, local_video_path: str):
-        # TODO: Add logic to check if video is fully downlaoded
-        response = requests.get(url, stream=True) # type: ignore
+        response = requests.get(url, stream=True)
         if response.status_code == 200:
             logger.info(f"Downloading video {local_video_path}...")
             try:

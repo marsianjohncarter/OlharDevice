@@ -1,8 +1,6 @@
-import os
-from time import sleep
-from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, QTime, pyqtSignal
+from datetime import date
+from PyQt5.QtCore import QTimer, Qt, pyqtSignal
 from PyQt5.QtGui import QFont
-from services import Services
 import logging
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel, QScrollArea
 import shutil
@@ -10,7 +8,12 @@ import psutil
 
 ASSETS_FOLDER = "./assets"
 
-# TODO: Add parent class for all widgets
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
+
+logger = logging.getLogger('diagnostic_menu')
+logger.setLevel(logging.DEBUG)
+
+
 class dataWindow(QScrollArea):
     def __init__(self):
         super().__init__()
@@ -22,15 +25,11 @@ class dataWindow(QScrollArea):
         self.openData(f'{ASSETS_FOLDER}/data/video_data.json')
 
         self.json_label = QLabel(text=f'{self.data}')
-        self.json_label.setStyleSheet('color: white')
+        self.json_label.setStyleSheet('color: white; font-weight: bold;')
 
-        self.update_data_btn = QPushButton(text='Update data')
-        self.update_data_btn.clicked.connect(lambda: self.updateJsonLabel(f'{ASSETS_FOLDER}/data/video_data.json'))
-        self.update_data_btn.setStyleSheet('background-color: white')
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
-        layout.addWidget(self.update_data_btn)
         layout.addWidget(self.json_label)
 
         widget = QWidget()
@@ -38,44 +37,56 @@ class dataWindow(QScrollArea):
         self.setWidget(widget)
         self.setWidgetResizable(True)
 
+        self.timer = QTimer(self)
+
+        self.timer.timeout.connect(lambda: self.updateJsonLabel(f'{ASSETS_FOLDER}/data/video_data.json'))
+        self.timer.start(1000)
 
 
     def openData(self, file):
-        with open(file, 'r') as txt:
-            list_of_lines = txt.read() 
-        self.data = list_of_lines
+        try:
+            with open(file, 'r') as txt:
+                list_of_lines = txt.read() 
+            self.data = list_of_lines   
+        except FileNotFoundError:
+            logger.error(f'File {file} not found')
+            self.data = 'File not found'
     
     def updateJsonLabel(self, file):
         with open(file, 'r') as txt:
             list_of_lines = txt.read() 
         self.json_label.setText(list_of_lines)
 
+    def keyPressEvent(self, qKeyEvent):
+        if qKeyEvent.key() == Qt.Key_Escape: 
+            self.close()
+        else:
+            super().keyPressEvent(qKeyEvent)
+
 class logWindow(QScrollArea):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Logs')
+        self.setWindowTitle(f'Log file: {date.today()}.log')
         self.setGeometry(400, 400, 700, 500)
         self.setStyleSheet("background-color: black;") 
 
         self.logs = 'Test'
-        self.openLogs('./dev.log')
+        self.openLogs(f'{ASSETS_FOLDER}/logs/{date.today()}.log')
 
         self.logs_label = QLabel(text=f'{self.logs}')
-        self.logs_label.setStyleSheet('color: white')
+        self.logs_label.setStyleSheet('color: white; font-weight: bold;')
 
-        self.updateLogsBtn = QPushButton(text='Update Logs')
-        self.updateLogsBtn.clicked.connect(lambda: self.updateLogLabel('./dev.log'))
-        self.updateLogsBtn.setStyleSheet('background-color: white')
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
-        layout.addWidget(self.updateLogsBtn)
         layout.addWidget(self.logs_label)
 
         widget = QWidget()
         widget.setLayout(layout)
+        self.timer = QTimer(self)
 
-        # self.setCentralWidget(widget)
+        self.timer.timeout.connect(lambda: self.updateLogLabel(f'{ASSETS_FOLDER}/logs/{date.today()}.log'))
+        self.timer.start(1000)
         
 
         self.setWidget(widget)
@@ -84,14 +95,25 @@ class logWindow(QScrollArea):
 
 
     def openLogs(self, file):
-        with open(file, 'r') as txt:
-            list_of_lines = txt.read() 
-        self.logs = list_of_lines
+        try:
+            with open(file, 'r') as txt:
+                list_of_lines = txt.read() 
+            self.logs = list_of_lines
+        except FileNotFoundError:
+            logger.error(f'File {file} not found')
+            self.logs = 'File not found'
+        
     
     def updateLogLabel(self, file):
         with open(file, 'r') as txt:
             list_of_lines = txt.read() 
         self.logs_label.setText(list_of_lines)
+
+    def keyPressEvent(self, qKeyEvent):
+        if qKeyEvent.key() == Qt.Key_Escape: 
+            self.close()
+        else:
+            super().keyPressEvent(qKeyEvent)
 
 class Menu(QMainWindow):
     sig = pyqtSignal()
@@ -125,14 +147,15 @@ class Menu(QMainWindow):
         self.cpu_util_label.setFont(default_font)
         self.cpu_util_label.setStyleSheet("font-size: 15px;")
 
-        self.updateBtn = QPushButton(text='Update Menu')
-        self.updateBtn.clicked.connect(self.updateMenu)
+        self.info_label = QLabel(text='(To exit press ESC)')
+        self.info_label.setAlignment(Qt.AlignCenter)
+        self.info_label.setFont(default_font)
 
+        layout.addWidget(self.info_label)
         layout.addWidget(self.json_btn)
         layout.addWidget(self.logs_btn)
         layout.addWidget(self.storage_label)
         layout.addWidget(self.cpu_util_label)
-        layout.addWidget(self.updateBtn)
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -173,6 +196,12 @@ class Menu(QMainWindow):
     
     def closeEvent(self, event):
         self.sig.emit() # type: ignore
+
+    def keyPressEvent(self, qKeyEvent):
+        if qKeyEvent.key() == Qt.Key_Escape: 
+            self.close()
+        else:
+            super().keyPressEvent(qKeyEvent)
 
 
 

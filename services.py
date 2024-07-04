@@ -1,6 +1,5 @@
 from datetime import date
 import json
-import os
 import requests
 import subprocess
 import configparser
@@ -11,11 +10,9 @@ from geopy.geocoders import Photon
 import serial
 
 SERIAL_PORT = "/dev/ttyUSB0"
-running = True
 
 
-logging.basicConfig(filename=f'./assets/logs/{date.today()}.log',
-                    filemode='w')
+logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
 
 logger = logging.getLogger('services')
 logger.setLevel(logging.DEBUG)
@@ -45,12 +42,9 @@ class Services:
         response = requests.get(url)
         if not (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
-            # TODO: Add error handling
-            pass
-        try:
-            return response.json()
-        except ValueError as e:
-            raise e
+            logger.error(f'Error loading json: {response.status_code}')
+            raise RuntimeError(f'Error loading json: {response.status_code}')
+        return response.json()
 
     def fetch_script(self, url):
         response = requests.get(url)
@@ -118,33 +112,38 @@ class Services:
         return degrees + "." + minutes
 
     def get_lat_lon(self):
-        gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
-        
-        data = gps.readline().decode('utf-8').rstrip()
-        message = data[0:6]
-        # print(message)
-        if (message == "$GNRMC"):
-            # GPRMC = Рекомендуемые минимальные конкретные данные GPS / транзит
-            # Чтение фиксированных данных GPS является альтернативным подходом, 
-            # который также работает
-            parts = data.split(",")
-            print(parts)
-            if parts[2] == 'V':
-                # V = Предупреждение, скорее всего, спутников нет в поле зрения ...
-                print ("GPS receiver warning")
-            else:
-                # Получить данные о местоположении, которые были переданы с сообщением GPRMC. 
-                # В этом примере интересуют только долгота и широта. Для других значений можно
-                # обратиться к http://aprs.gids.nl/nmea/#rmc
-                longitude = self.formatDegreesMinutes(parts[5], 3)
-                latitude = self.formatDegreesMinutes(parts[3], 2)
-                logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
-        else:
-            # Обрабатывать другие сообщения NMEA и неподдерживаемые строки
-            pass
+        try:
+                gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
+                
+                data = gps.readline().decode('utf-8').rstrip()
+                message = data[0:6]
+                # print(message)
+                if (message == "$GNRMC"):
+                    # GPRMC = Рекомендуемые минимальные конкретные данные GPS / транзит
+                    # Чтение фиксированных данных GPS является альтернативным подходом, 
+                    # который также работает
+                    parts = data.split(",")
+                    print(parts)
+                    if parts[2] == 'V':
+                        # V = Предупреждение, скорее всего, спутников нет в поле зрения ...
+                        print ("GPS receiver warning")
+                    else:
+                        # Получить данные о местоположении, которые были переданы с сообщением GPRMC. 
+                        # В этом примере интересуют только долгота и широта. Для других значений можно
+                        # обратиться к http://aprs.gids.nl/nmea/#rmc
+                        longitude = self.formatDegreesMinutes(parts[5], 3)
+                        latitude = self.formatDegreesMinutes(parts[3], 2)
+                        logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
+                else:
+                    # Обрабатывать другие сообщения NMEA и неподдерживаемые строки
+                    pass
 
-        gps.close()
-        return [latitude, longitude]
+                gps.close()
+                return [latitude, longitude]
+        except Exception as e:
+            logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
+            g = geocoder.ip('me')
+            return g.latlng
     # TODO: Check if delete_file is needed
     # def delete_file(self, path):
     #     if os.path.exists(path):
@@ -154,13 +153,7 @@ class Services:
     #         except PermissionError:
     #             logger.error(f'Error deleting file: {path}')
 
-    def get_logger(self, name):
-        log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'
-        logging.basicConfig(level=logging.DEBUG,
-                            format=log_format,
-                            filename='dev.log',
-                            filemode='w')
-        return logging.getLogger(name)
+
 
     def save_json(self, dictionary, path: str):
         with open(path, "w") as outfile:

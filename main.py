@@ -3,7 +3,9 @@ from services import Services
 from application import App
 from PyQt5.QtWidgets import QApplication
 import logging
-from datetime import date
+from datetime import date, timedelta
+import screen_brightness_control as sbc
+import darkdetect
 
 BASE_URL = 'https://api.olhar.media/'
 
@@ -17,7 +19,22 @@ logger = logging.getLogger('main')
 
 logger.setLevel(logging.DEBUG)
 
+def set_brightness():
+    if darkdetect.isDark():
+        sbc.fade_brightness(50)
+    else:
+        sbc.fade_brightness(100, increment = 10)
+    
 
+def delete_old_logs():
+    directory = './assets/logs'
+    for filename in os.scandir(directory):
+        if not filename.is_file():
+            continue
+        date_created = filename.name[:10]
+        week_ago = date.today() - timedelta(days=7)
+        if date_created == str(week_ago):
+            os.remove(os.path.join(directory, filename.name))
 
 # def filter_video_data(video_data):
 #     new_video_data = []
@@ -34,31 +51,32 @@ logger.setLevel(logging.DEBUG)
 #     return new_video_data
 
 
-def run_maintenance_script():
-    try:
-        logger.info('Fetching script...')
-        script = service.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
-        if script:
-            if service.is_valid_bash(script):
-                with open('script.sh', 'wb') as f:
-                    f.write(script.encode())
-                service.run_bash('./script.sh')
-                os.remove('./script.sh')
-                logger.info('Script executed successfully')
-            elif service.is_valid_python(script):
-                with open('script.py', 'wb') as f:
-                    f.write(script.encode())
-                service.run_python('./script.py')
-                os.remove('./script.py')
-                logger.info('Script executed successfully')
-    except Exception as e:
-        logger.error(e)
+# def run_maintenance_script():
+#     try:
+#         logger.info('Fetching script...')
+#         script = service.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
+#         if script:
+#             if service.is_valid_bash(script):
+#                 with open('script.sh', 'wb') as f:
+#                     f.write(script.encode())
+#                 service.run_bash('./script.sh')
+#                 os.remove('./script.sh')
+#                 logger.info('Script executed successfully')
+#             elif service.is_valid_python(script):
+#                 with open('script.py', 'wb') as f:
+#                     f.write(script.encode())
+#                 service.run_python('./script.py')
+#                 os.remove('./script.py')
+#                 logger.info('Script executed successfully')
+#     except Exception as e:
+#         logger.error(e)
 
 
 
 def main():
-    run_maintenance_script()
-
+    # run_maintenance_script()
+    delete_old_logs()
+    set_brightness()
     try:   
         logger.info('Fetching video data...')
         video_data = service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
@@ -76,5 +94,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
+    sbc.get_brightness()
+    sbc.fade_brightness(100, increment = 10)
 
