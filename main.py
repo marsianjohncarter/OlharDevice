@@ -36,19 +36,19 @@ def delete_old_logs():
         if date_created == str(week_ago):
             os.remove(os.path.join(directory, filename.name))
 
-# def filter_video_data(video_data):
-#     new_video_data = []
-#     for i in video_data:
-#         if 'locations' not in i:
-#             logger.error(f"Video object {i} has no 'locations' attribute.")
-#             continue
-#         for city in i['locations']:
-#             if 'enname' not in city:
-#                 logger.error(f"City object {city} has no 'enname' attribute.")
-#                 continue
-#             if city['enname'] == current_city:
-#                 new_video_data.append(i)
-#     return new_video_data
+def filter_video_data(video_data):
+    new_video_data = []
+    for i in video_data:
+        if 'locations' not in i:
+            logger.error(f"Video object {i} has no 'locations' attribute.")
+            continue
+        for city in i['locations']:
+            if 'enname' not in city:
+                logger.error(f"City object {city} has no 'enname' attribute.")
+                continue
+            if city['enname'] == current_city:
+                new_video_data.append(i)
+    return new_video_data
 
 
 # def run_maintenance_script():
@@ -85,10 +85,10 @@ def main():
         raise RuntimeError('Failed to fetch video data') from e
     app = QApplication([])
     w = App()
-    w.set_video_data(video_data)
-    w.load_videos(video_data)
-    # w.set_video_data(filter_video_data(video_data))
-    # w.load_videos(filter_video_data(video_data))
+    # w.set_video_data(video_data)
+    # w.load_videos(video_data)
+    w.set_video_data(filter_video_data(video_data))
+    w.load_videos(filter_video_data(video_data))
     w.show()
     app.exec_()
 
