@@ -8,6 +8,10 @@ INFO:geocoder.base:Requested http://ipinfo.io/json
 DEBUG:geopy:Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
 DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): photon.komoot.io:443
 DEBUG:urllib3.connectionpool:https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
+INFO:main:Fetching script...
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.olhar.media:443
+DEBUG:urllib3.connectionpool:https://api.olhar.media:443 "GET /?getconfigupdate&equipid=1 HTTP/1.1" 200 204
+INFO:services:Script loaded successfully
 DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw' = [KeyError]
 DEBUG:screen_brightness_control:get_display_info: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
 DEBUG:screen_brightness_control:cache set 'windows_monitors_info_raw', expires=1
@@ -16,67 +20,9 @@ DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
 DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
 DEBUG:screen_brightness_control:cache get 'vcp_brightness_0' = [KeyError]
 DEBUG:screen_brightness_control:cache set 'vcp_brightness_0', expires=0.1
-DEBUG:screen_brightness_control:fade display 0 of <class 'screen_brightness_control.windows.VCP'> 100->50:-1:logarithmic=True
+DEBUG:screen_brightness_control:fade display 0 of <class 'screen_brightness_control.windows.VCP'> 50->50:1:logarithmic=True
 DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
 DEBUG:screen_brightness_control:cache expire key 'vcp_brightness_0'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw' = [expired]
-DEBUG:screen_brightness_control:get_display_info: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache set 'windows_monitors_info_raw', expires=1
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw' = [expired]
-DEBUG:screen_brightness_control:get_display_info: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache set 'windows_monitors_info_raw', expires=1
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
 DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
 DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
 DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
@@ -100,41 +46,5 @@ INFO:geocoder.base:Requested http://ipinfo.io/json
 DEBUG:geopy:Photon.reverse: https://photon.komoot.io/reverse?lat=38.691&lon=-121.4486&limit=1
 DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): photon.komoot.io:443
 DEBUG:urllib3.connectionpool:https://photon.komoot.io:443 "GET /reverse?lat=38.691&lon=-121.4486&limit=1 HTTP/1.1" 200 None
-INFO:application:Current city: Rio Linda, 95673, California, United States
-CRITICAL:application:No videos found for city Rio Linda, 95673, California, United States.
-DEBUG:screen_brightness_control:brightness get request display None with method None
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw' = [expired]
-DEBUG:screen_brightness_control:get_display_info: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache set 'windows_monitors_info_raw', expires=1
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'vcp_brightness_0' = [expired]
-DEBUG:screen_brightness_control:cache set 'vcp_brightness_0', expires=0.1
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'vcp_brightness_0'
-DEBUG:screen_brightness_control:cache set 'vcp_brightness_0', expires=0.1
-DEBUG:screen_brightness_control:fade display 0 of <class 'screen_brightness_control.windows.VCP'> 50->100:10:logarithmic=True
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:cache expire key 'vcp_brightness_0'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'vcp_brightness_0' = [KeyError]
-DEBUG:screen_brightness_control:cache set 'vcp_brightness_0', expires=0.1
-DEBUG:screen_brightness_control:brightness get request display None with method None
-DEBUG:screen_brightness_control:cache get 'windows_monitors_info_raw'
-DEBUG:screen_brightness_control:iter_physical_monitors: failed to gather list of laptop displays - <x_wmi: Unexpected COM Error (-2147217396, 'OLE error 0x8004100c', None, None)>
-DEBUG:screen_brightness_control:cache get 'vcp_brightness_0'
-DEBUG:screen_brightness_control:cache set 'vcp_brightness_0', expires=0.1
+INFO:application:Current city: Rio Linda
+CRITICAL:application:No videos found for city Rio Linda.

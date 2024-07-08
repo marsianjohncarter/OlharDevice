@@ -8,15 +8,16 @@ import qrcode
 import requests
 from services import Services
 from video_player import VideoPlayer
-from diagnostic_menu import Menu
+from diagnostic_menu import DiagnosticMenu
+import json
+
 
 
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
 
-logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
-logger = logging.getLogger('application')
+
 
 
 
@@ -30,7 +31,8 @@ class App(QMainWindow):
         self.service = Services()
         self.current_city = self.service.get_current_city()
 
-        logger.info(f'Current city: {self.current_city}')
+        self.logger = logging.getLogger('application')
+        self.logger.info(f'Current city: {self.current_city}')
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -63,55 +65,48 @@ class App(QMainWindow):
         self.current_video_index = 0
         self.video_list = []
         self.video_data = []
-        self.menu_window = None
-
-        self.logs = {
-                "app.load_video_data": "",
-                "app.load_videos": "",
-                "app.play_next_video": "",
-                "app.show_qr_code": "",
-            }
-        
+        self.diagnostic_window = None # It changes in set_video_data()
+        self.diagnostic_window_open = False
         self.video_player.finished.connect(self.fade_out_video) # type: ignore
-
 
     def download_video(self, url, local_video_path: str):
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            logger.info(f"Downloading video {local_video_path}...")
+            self.logger.info(f"Downloading video {local_video_path}...")
             try:
                 with open(f"{local_video_path}.dat.incomplete", "wb") as file:
                     for chunk in response.iter_content(chunk_size=1024*1024):
                         file.write(chunk)
                 os.rename(f"{local_video_path}.dat.incomplete", local_video_path)
-                logger.info(f"Video {local_video_path} downloaded successfully")
+                self.logger.info(f"Video {local_video_path} downloaded successfully")
             except Exception as e:
-                logger.critical(f"Video could not be downloaded. Error: {e}")
+                self.logger.critical(f"Video could not be downloaded. Error: {e}")
         else:
-            logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
+            self.logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
     def set_video_data(self, video_data):
         self.video_data = video_data
+        self.diagnostic_window = DiagnosticMenu(json.dumps(video_data, indent=4))
         try:
             self.service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
         except Exception as e:
-            logger.error(e)
+            self.logger.critical(e)
 
-    def load_videos(self, video_data):
+    def start_videos(self, video_data):
         self.video_url_list = [BASE_URL + '/videos/' + video['serverfilename'] for video in video_data]
         self.video_list = [video['serverfilename'] for video in video_data]
 
-        for video_url in self.video_url_list:
-            local_video_path = 'assets/videos/' + self.video_list[self.video_url_list.index(video_url)]
-            if not os.path.exists(local_video_path):
-                self.download_video(video_url, local_video_path)
-                
-        if self.video_list:
+        for i, video_url in enumerate(self.video_url_list):
+                    local_video_path = f'P{ASSETS_FOLDER}/videos/' + self.video_list[i]
+                    self.download_video(video_url, local_video_path)
+        if len(self.video_list) > 0:
             self.play_next_video()
         else:
-            logger.critical(f"No videos found for city {self.current_city}.")
+            self.logger.critical(f"No videos found for city {self.current_city}.")
+            # raise RuntimeError(f"No videos found for city {self.current_city}.")
 
     def play_next_video(self):
+        self.service.set_brightness()
         self.qr_code_label.hide()
         self.message_label.hide()
         self.video_player.video_widget.show()
@@ -121,7 +116,7 @@ class App(QMainWindow):
             self.current_video_index += 1
         else:
             self.current_video_index = 0
-            self.load_videos(self.video_data)
+            self.start_videos(self.video_data)
             
     def fade_out_video(self):
         self.show_qr_code()
@@ -133,7 +128,7 @@ class App(QMainWindow):
                 current_video_data = self.video_data[self.current_video_index - 1]
                 video_id = current_video_data['id']
                 equip_id = self.service.get_param_from_config('config.ini', 'PN')
-                equip_ip = "192.168.1.1"
+                equip_ip = f'{requests.get("https://api.ipify.org").content.decode("utf8")}'
                 lat_and_lon = self.service.get_lat_lon()
                 url = f"https://link.olhar.media/?golink=1&equipid={equip_id}&videoid={video_id}&equipip={equip_ip}&gpslat={lat_and_lon[0]}&gpslon={lat_and_lon[1]}"
                 qr = qrcode.QRCode(  # type: ignore
@@ -176,14 +171,13 @@ class App(QMainWindow):
             super().keyPressEvent(qKeyEvent)
     
     def openMenu(self):
-        if not self.menu_window:
-            self.menu_window = Menu()
-            self.menu_window.sig.connect(self.menuClosed) # type: ignore
-
-            self.menu_window.show()
+        if not self.diagnostic_window_open:
+            self.diagnostic_window_open = True
+            self.diagnostic_window.sig.connect(self.menuClosed) 
+            self.diagnostic_window.show()
         else:
-            self.menu_window.hide()
-            self.menu_window = None
+            self.diagnostic_window_open = False
+            self.diagnostic_window.hide()
 
     def menuClosed(self):
-        self.menu_window = None
+        self.diagnostic_window_open = False

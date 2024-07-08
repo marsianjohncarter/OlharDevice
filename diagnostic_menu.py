@@ -8,21 +8,18 @@ import psutil
 
 ASSETS_FOLDER = "./assets"
 
-logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
 
-logger = logging.getLogger('diagnostic_menu')
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger('diagnostic_diagnosticmenu')
 
 
-class dataWindow(QScrollArea):
-    def __init__(self):
+class DataScrollArea(QScrollArea):
+    def __init__(self, video_data):
         super().__init__()
         self.setWindowTitle('Logs')
         self.setGeometry(400, 400, 700, 500)
         self.setStyleSheet("background-color: black;") 
 
-        self.data = 'None'
-        self.openData(f'{ASSETS_FOLDER}/data/video_data.json')
+        self.data = video_data
 
         self.json_label = QLabel(text=f'{self.data}')
         self.json_label.setStyleSheet('color: white; font-weight: bold;')
@@ -37,25 +34,6 @@ class dataWindow(QScrollArea):
         self.setWidget(widget)
         self.setWidgetResizable(True)
 
-        self.timer = QTimer(self)
-
-        self.timer.timeout.connect(lambda: self.updateJsonLabel(f'{ASSETS_FOLDER}/data/video_data.json'))
-        self.timer.start(1000)
-
-
-    def openData(self, file):
-        try:
-            with open(file, 'r') as txt:
-                list_of_lines = txt.read() 
-            self.data = list_of_lines   
-        except FileNotFoundError:
-            logger.error(f'File {file} not found')
-            self.data = 'File not found'
-    
-    def updateJsonLabel(self, file):
-        with open(file, 'r') as txt:
-            list_of_lines = txt.read() 
-        self.json_label.setText(list_of_lines)
 
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == Qt.Key_Escape: 
@@ -63,7 +41,7 @@ class dataWindow(QScrollArea):
         else:
             super().keyPressEvent(qKeyEvent)
 
-class logWindow(QScrollArea):
+class LogScrollArea(QScrollArea):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f'Log file: {date.today()}.log')
@@ -71,10 +49,11 @@ class logWindow(QScrollArea):
         self.setStyleSheet("background-color: black;") 
 
         self.logs = 'Test'
-        self.openLogs(f'{ASSETS_FOLDER}/logs/{date.today()}.log')
 
         self.logs_label = QLabel(text=f'{self.logs}')
         self.logs_label.setStyleSheet('color: white; font-weight: bold;')
+
+        self.updateLogs(f'{ASSETS_FOLDER}/logs/{date.today()}.log')
 
 
         layout = QVBoxLayout()
@@ -85,7 +64,7 @@ class logWindow(QScrollArea):
         widget.setLayout(layout)
         self.timer = QTimer(self)
 
-        self.timer.timeout.connect(lambda: self.updateLogLabel(f'{ASSETS_FOLDER}/logs/{date.today()}.log'))
+        self.timer.timeout.connect(lambda: self.updateLogs(f'{ASSETS_FOLDER}/logs/{date.today()}.log'))
         self.timer.start(1000)
         
 
@@ -94,7 +73,8 @@ class logWindow(QScrollArea):
 
 
 
-    def openLogs(self, file):
+    
+    def updateLogs(self, file):
         try:
             with open(file, 'r') as txt:
                 list_of_lines = txt.read() 
@@ -102,12 +82,8 @@ class logWindow(QScrollArea):
         except FileNotFoundError:
             logger.error(f'File {file} not found')
             self.logs = 'File not found'
-        
-    
-    def updateLogLabel(self, file):
-        with open(file, 'r') as txt:
-            list_of_lines = txt.read() 
         self.logs_label.setText(list_of_lines)
+        
 
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == Qt.Key_Escape: 
@@ -115,17 +91,21 @@ class logWindow(QScrollArea):
         else:
             super().keyPressEvent(qKeyEvent)
 
-class Menu(QMainWindow):
+class DiagnosticMenu(QMainWindow):
     sig = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, video_data):
         super().__init__()
-        self.setWindowTitle('Menu')
+        self.setWindowTitle('Diagnostic Menu')
         self.setGeometry(400, 400, 700, 500)
-        self.logs_window = None
-        self.json_window = None
 
+        self.video_data = video_data
 
+        self.logs_scroll_area = LogScrollArea()
+        self.logs_scroll_area_open = False
+
+        self.json_scroll_area = DataScrollArea(self.video_data)
+        self.json_scroll_area_open = False
 
         default_font = QFont()
         default_font.setBold(True)
@@ -133,9 +113,9 @@ class Menu(QMainWindow):
 
         
         self.logs_btn = QPushButton(text='Open Logs')
-        self.logs_btn.clicked.connect(self.openLogs)        
+        self.logs_btn.clicked.connect(self.toggleLogs)        
         self.json_btn = QPushButton(text='Open Company Data')
-        self.json_btn.clicked.connect(self.openJson)
+        self.json_btn.clicked.connect(self.toggleJson)
         storage_info = self.getStorageInfo()
         self.storage_label = QLabel(text=f'Storage: \nTotal: {storage_info["total"]}GB | Used: {storage_info["used"]}GB | Free: {storage_info["free"]}GB')
         self.storage_label.setStyleSheet("font-size: 15px;")
@@ -162,25 +142,25 @@ class Menu(QMainWindow):
         self.setCentralWidget(widget)
         self.timer = QTimer(self)
 
-        self.timer.timeout.connect(self.updateMenu)
+        self.timer.timeout.connect(self.updatediagnosticMenu)
         self.timer.start(1000)
         
 
-    def openLogs(self):
-        if not self.logs_window:
-            self.logs_window = logWindow()
-            self.logs_window.show()
+    def toggleLogs(self):
+        if not self.logs_scroll_area_open:
+            self.logs_scroll_area.show()
+            self.logs_scroll_area_open = True
         else:
-            self.logs_window.hide()
-            self.logs_window= None
+            self.logs_scroll_area.hide()
+            self.logs_scroll_area_open = False
     
-    def openJson(self):
-        if not self.json_window:
-            self.json_window = dataWindow()
-            self.json_window.show()
+    def toggleJson(self):
+        if not self.json_scroll_area_open:
+            self.json_scroll_area.show()
+            self.json_scroll_area_open = True
         else:
-            self.json_window.hide()
-            self.json_window = None
+            self.json_scroll_area.hide()
+            self.json_scroll_area_open = False
 
     def getStorageInfo(self):
         total, used, free = shutil.disk_usage("/")
@@ -189,7 +169,7 @@ class Menu(QMainWindow):
     def getCpuInfo(self):
         return f"CPU utilization: {psutil.cpu_percent()}%"
 
-    def updateMenu(self):
+    def updatediagnosticMenu(self):
         storage_info = self.getStorageInfo()
         self.storage_label.setText(f'Storage: \nTotal: {storage_info["total"]}GB | Used: {storage_info["used"]}GB | Free: {storage_info["free"]}GB')
         self.cpu_util_label.setText(f'{self.getCpuInfo()}')

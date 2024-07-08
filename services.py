@@ -8,50 +8,33 @@ import ast
 import logging
 from geopy.geocoders import Photon
 import serial
+import darkdetect
+import screen_brightness_control as sbc
+
 
 SERIAL_PORT = "/dev/ttyUSB0"
 
 
-logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
-
-logger = logging.getLogger('services')
-logger.setLevel(logging.DEBUG)
 
 class Services:
     def __init__(self):
-
+        self.logger = logging.getLogger('services')
         self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
-    def run_bash(self, script_path):
-        try:
-            subprocess.run(["bash", script_path], capture_output=True)
-            logger.info('Script executed successfully')
-        except subprocess.CalledProcessError as e:
-            logger.error(f'Error running bash script: {e}')
-
-    def run_python(self, script_path):
-        try:
-            with open(script_path, 'r') as f:
-                script = f.read()
-            exec(script)
-            logger.info('Script executed successfully')
-        except Exception as e:
-            logger.error(f'Error running python script: {e}')
-            
     def fetch_json(self, url):
         response = requests.get(url)
         if not (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
-            logger.error(f'Error loading json: {response.status_code}')
+            self.logger.error(f'Error loading json: {response.status_code}')
             raise RuntimeError(f'Error loading json: {response.status_code}')
         return response.json()
 
     def fetch_script(self, url):
         response = requests.get(url)
         if response.status_code != 204:
-            logger.info('Script loaded successfully')
+            self.logger.info('Script loaded successfully')
             return response.text
-        logger.error(f'Error loading script: {response.status_code}')
+        self.logger.error(f'Error loading script: {response.status_code}')
         return None
 
     def is_valid_python(self, code):
@@ -80,9 +63,9 @@ class Services:
         }
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            logger.info('Video view registered successfully')
+            self.logger.info('Video view registered successfully')
         else:
-            logger.error(f'Error registering video view: {response.status_code}')
+            self.logger.error(f'Error registering video view: {response.status_code}')
 
     def get_param_from_config(self, config_path: str, param_name: str):
         config = configparser.ConfigParser()
@@ -91,7 +74,7 @@ class Services:
             part_number = config['General'][f'{param_name}']
             return part_number
         except FileNotFoundError:
-            logger.error(f'Config file not found: {config_path}')
+            self.logger.error(f'Config file not found: {config_path}')
             return None
 
     def formatDegreesMinutes(self, coordinates, digits):
@@ -133,7 +116,7 @@ class Services:
                         # обратиться к http://aprs.gids.nl/nmea/#rmc
                         longitude = self.formatDegreesMinutes(parts[5], 3)
                         latitude = self.formatDegreesMinutes(parts[3], 2)
-                        logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
+                        self.logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
                 else:
                     # Обрабатывать другие сообщения NMEA и неподдерживаемые строки
                     pass
@@ -141,19 +124,13 @@ class Services:
                 gps.close()
                 return [latitude, longitude]
         except Exception as e:
-            logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
-            g = geocoder.ip('me')
-            return g.latlng
-    # TODO: Check if delete_file is needed
-    # def delete_file(self, path):
-    #     if os.path.exists(path):
-    #         try:
-    #             os.remove(path)
-    #             logger.info(f'Deleted file: {path}')
-    #         except PermissionError:
-    #             logger.error(f'Error deleting file: {path}')
-
-
+            self.logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
+            try:
+                g = geocoder.ip('me')
+                return g.latlng
+            except Exception as e:
+                self.logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
+                raise RuntimeError(f'Error getting GPS coordinates through IP geolocation') from e
 
     def save_json(self, dictionary, path: str):
         with open(path, "w") as outfile:
@@ -165,9 +142,15 @@ class Services:
 
         location_lat_lon = self.get_lat_lon()
 
-        Latitude = f"{location_lat_lon[0]}"
-        Longitude = f"{location_lat_lon[1]}"
+        latitude = f"{location_lat_lon[0]}"
+        longitude = f"{location_lat_lon[1]}"
         
-        location = geolocator.reverse(Latitude+","+Longitude)
+        location = geolocator.reverse(f'{latitude},{longitude}')
 
-        return location
+        return location.raw['properties']['name']
+
+    def set_brightness(self):               
+        if darkdetect.isDark():
+            sbc.fade_brightness(50)
+        else:
+            sbc.fade_brightness(100, increment = 10)
