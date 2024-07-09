@@ -1,4 +1,3 @@
-from datetime import date
 import logging
 import os
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QGraphicsOpacityEffect
