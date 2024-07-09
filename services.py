@@ -1,4 +1,3 @@
-from datetime import date
 import json
 import requests
 import subprocess
@@ -149,7 +148,7 @@ class Services:
 
         return location.raw['properties']['name']
 
-    def set_brightness(self):               
+    def set_brightness(self):
         if darkdetect.isDark():
             sbc.fade_brightness(50)
         else:

@@ -11,15 +11,9 @@ from video_player import VideoPlayer
 from diagnostic_menu import DiagnosticMenu
 import json
 
-
-
 BASE_URL = 'https://api.olhar.media/'
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
-
-
-
-
 
 class App(QMainWindow):
 

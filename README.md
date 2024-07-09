@@ -1,62 +1,100 @@
-# Ad app
-
-## Description
-This is a video advertising processing application developed using PyQt5. It allows users to stream and display videos using a specified URL. The app includes features such as full screen mode, QR code generation, and video response tracking.
-
-## How does it work
-The application consists of three main components:
-1. `main.py` - Entry point to the application. Initializes the GUI and handles user interactions.
-2. `application.py` - Contains the main application logic, including the video player widget and main window.
-3. `video_player.py` - PyQt video widget
-4. `services.py` - includes additional functions for various services, such as video registration and control settings.
-
-### Main functions
-- **Full Screen Video**: Video is displayed in full screen for maximum environmental coverage.
-- **QR Code Generation**: sequential application of QR codes that can be used to quickly access additional information.
-- **Output Output Monitoring**: The application monitors the video output status and can take actions when the output is completed.
-
-## Dependencies
-To run this project you need to install the following dependencies:
-- Python 3.x
-- PyQt5
-- Requests
-- QR code
-- geocoder
-- os
-- subprocess
 
 
-You can install using the following command:
-``` bash
-pip install PyQt5 requests qrcode geocoder
-```
+## Documentation
 
+### Overview
+This documentation is aimed at programmers who are unfamiliar with the codebase. It explains the purpose and functionality of each file and class in detail.
 
-# Приложение для воспроизведения рекламы
-
-## Описание
-Это приложение для воспроизведения видео рекламы, разработанное с использованием PyQt5. Оно позволяет пользователям транслировать и отображать видео по указанному URL. Приложение включает в себя функции, такие как полноэкранный режим, генерация QR-кодов и отслеживание статуса воспроизведения видео.
-
-## Как работает
-Приложение состоит из трех основных компонентов:
-1. `main.py` - Точка входа в приложение. Инициализирует графический интерфейс и обрабатывает взаимодействия с пользователем.
-2. `application.py` - Содержит основную логику приложения, включая виджет видеоплеера и главное окно.
-3. `services.py` - Включает вспомогательные функции для различных сервисов, таких как регистрация видео и управление конфигурацией.
-
-### Основные функции
-- **Полноэкранное воспроизведение видео**: Видео отображается в полноэкранном режиме для максимального охвата аудитории.
-- **Генерация QR-кодов**: Приложение генерирует QR-коды, которые могут быть использованы для быстрого доступа к дополнительной информации.
-- **Отслеживание статуса воспроизведения**: Приложение отслеживает статус воспроизведения видео и может выполнять действия по завершении воспроизведения.
-
-## Зависимости
-Для запуска этого проекта необходимо установить следующие зависимости:
-- Python 3.x
+### Dependencies
+Ensure the following dependencies are installed:
 - PyQt5
 - requests
 - qrcode
-- geocoder
+- geopy
+- darkdetect
+- screen-brightness-control
+- logging
 
-Вы можете установить зависимости с помощью следующей команды:
+Install the dependencies using:
 ```bash
-pip install PyQt5 requests qrcode geocoder
+pip install PyQt5 requests qrcode geopy darkdetect screen-brightness-control logging
 ```
+
+### `main.py`
+
+#### Purpose
+The `main.py` file is the entry point of the application. It initializes the main components and starts the event loop.
+
+#### `Main` Class
+- **Initialization (`__init__`)**:
+  - Creates an instance of `Services` to interact with external services.
+  - Initializes the main application window (`App`).
+  - Sets up a timer to periodically update the video list and UI.
+
+- **Starting the Application (`start`)**:
+  - Enters the Qt main event loop to start the application.
+
+### `application.py`
+
+#### Purpose
+The `application.py` file contains the main application window, which manages the user interface and interactions.
+
+#### `App` Class
+- **Initialization (`__init__`)**:
+  - Sets up the application window with a title and full-screen mode.
+  - Initializes the `Services` class to get the current city.
+  - Configures logging to record application events.
+  - Sets up the central widget and layout for the UI components.
+  - Adds a video player, message label, and QR code label to the layout.
+  - Initializes the video list and diagnostic menu.
+
+- **QR Code Generation (`create_qr_code`)**:
+  - Generates a QR code from a given URL.
+
+- **Message Display (`show_message`, `hide_message`)**:
+  - Shows or hides the message label.
+
+- **QR Code Display (`show_qr_code`, `hide_qr_code`)**:
+  - Shows or hides the QR code label.
+
+- **Video Management (`load_video_list`, `play_next_video`)**:
+  - Loads the video list from the service and plays the next video in the list.
+
+- **Video Status Check (`check_video_status`)**:
+  - Checks the media player status and updates the UI accordingly.
+
+- **Video Ended Signal (`send_video_ended_signal`)**:
+  - Sends a signal to the server when a video ends.
+
+### `services.py`
+
+#### Purpose
+The `services.py` file provides services related to location and screen brightness.
+
+#### `Services` Class
+- **Initialization (`__init__`)**:
+  - Initializes the service class without any parameters.
+
+- **Location Retrieval (`get_current_city`, `get_lat_lon`, `get_location`)**:
+  - Gets the current latitude and longitude.
+  - Retrieves the city name based on the latitude and longitude.
+
+- **Screen Brightness (`set_brightness`)**:
+  - Adjusts the screen brightness based on whether it's day or night.
+
+### `video_player.py`
+
+#### Purpose
+The `video_player.py` file contains the video player component that plays videos.
+
+#### `VideoPlayer` Class
+- **Initialization (`__init__`)**:
+  - Sets up the video player UI components.
+  - Initializes the media player and connects it to the video widget.
+
+- **Playing Videos (`show_local_video`)**:
+  - Plays a local video file and handles any errors that occur.
+
+- **Media Status Check (`check_status`)**:
+  - Checks the media player status and emits a `finished` signal when a video ends.
+

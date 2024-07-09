@@ -34,7 +34,6 @@ class DataScrollArea(QScrollArea):
         self.setWidget(widget)
         self.setWidgetResizable(True)
 
-
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == Qt.Key_Escape: 
             self.close()
@@ -70,10 +69,7 @@ class LogScrollArea(QScrollArea):
 
         self.setWidget(widget)
         self.setWidgetResizable(True)
-
-
-
-    
+  
     def updateLogs(self, file):
         try:
             with open(file, 'r') as txt:
@@ -83,8 +79,7 @@ class LogScrollArea(QScrollArea):
             logger.error(f'File {file} not found')
             self.logs = 'File not found'
         self.logs_label.setText(list_of_lines)
-        
-
+       
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == Qt.Key_Escape: 
             self.close()
@@ -145,7 +140,6 @@ class DiagnosticMenu(QMainWindow):
         self.timer.timeout.connect(self.updatediagnosticMenu)
         self.timer.start(1000)
         
-
     def toggleLogs(self):
         if not self.logs_scroll_area_open:
             self.logs_scroll_area.show()

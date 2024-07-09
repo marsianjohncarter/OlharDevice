@@ -67,8 +67,6 @@ def main():
         raise RuntimeError('Failed to fetch video data') from e
     app = QApplication([])
     w = App()
-    # w.set_video_data(video_data)
-    # w.load_videos(video_data)
     w.set_video_data(filter_video_data(video_data))
     w.start_videos(filter_video_data(video_data))
     w.show()
