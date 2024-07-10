@@ -1,4 +1,6 @@
 import json
+import os
+import stat
 import requests
 import subprocess
 import configparser
@@ -12,28 +14,25 @@ import screen_brightness_control as sbc
 
 
 SERIAL_PORT = "/dev/ttyUSB0"
+BASE_URL = 'https://api.olhar.media/'
 
+logger = logging.getLogger('services')
 
 
 class Services:
-    def __init__(self):
-        self.logger = logging.getLogger('services')
-        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-
     def fetch_json(self, url):
-        response = requests.get(url)
+        response = requests.get(f'{BASE_URL}{url}')
         if not (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
-            self.logger.error(f'Error loading json: {response.status_code}')
             raise RuntimeError(f'Error loading json: {response.status_code}')
         return response.json()
 
     def fetch_script(self, url):
         response = requests.get(url)
         if response.status_code != 204:
-            self.logger.info('Script loaded successfully')
+            logger.info('Script loaded successfully')
             return response.text
-        self.logger.error(f'Error loading script: {response.status_code}')
+        logger.error(f'Error loading script: {response.status_code}')
         return None
 
     def is_valid_python(self, code):
@@ -62,9 +61,9 @@ class Services:
         }
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            self.logger.info('Video view registered successfully')
+            logger.info('Video view registered successfully')
         else:
-            self.logger.error(f'Error registering video view: {response.status_code}')
+            logger.error(f'Error registering video view: {response.status_code}')
 
     def get_param_from_config(self, config_path: str, param_name: str):
         config = configparser.ConfigParser()
@@ -73,7 +72,7 @@ class Services:
             part_number = config['General'][f'{param_name}']
             return part_number
         except FileNotFoundError:
-            self.logger.error(f'Config file not found: {config_path}')
+            logger.error(f'Config file not found: {config_path}')
             return None
 
     def formatDegreesMinutes(self, coordinates, digits):
@@ -99,36 +98,33 @@ class Services:
                 
                 data = gps.readline().decode('utf-8').rstrip()
                 message = data[0:6]
-                # print(message)
                 if (message == "$GNRMC"):
                     # GPRMC = Рекомендуемые минимальные конкретные данные GPS / транзит
                     # Чтение фиксированных данных GPS является альтернативным подходом, 
                     # который также работает
                     parts = data.split(",")
-                    print(parts)
                     if parts[2] == 'V':
                         # V = Предупреждение, скорее всего, спутников нет в поле зрения ...
-                        print ("GPS receiver warning")
+                        raise RuntimeError('No satellites in view')
                     else:
                         # Получить данные о местоположении, которые были переданы с сообщением GPRMC. 
                         # В этом примере интересуют только долгота и широта. Для других значений можно
                         # обратиться к http://aprs.gids.nl/nmea/#rmc
                         longitude = self.formatDegreesMinutes(parts[5], 3)
                         latitude = self.formatDegreesMinutes(parts[3], 2)
-                        self.logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
+                        logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
                 else:
-                    # Обрабатывать другие сообщения NMEA и неподдерживаемые строки
-                    pass
+                    raise RuntimeError('Invalid NMEA message')
 
                 gps.close()
                 return [latitude, longitude]
         except Exception as e:
-            self.logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
+            logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
             try:
                 g = geocoder.ip('me')
                 return g.latlng
             except Exception as e:
-                self.logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
+                logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
                 raise RuntimeError(f'Error getting GPS coordinates through IP geolocation') from e
 
     def save_json(self, dictionary, path: str):
@@ -153,3 +149,30 @@ class Services:
             sbc.fade_brightness(50)
         else:
             sbc.fade_brightness(100, increment = 10)
+
+    def filter_video_data(self, video_data):
+        new_video_data = []
+        for i in video_data:
+            if 'locations' not in i:
+                logger.error(f"Video object {i} has no 'locations' attribute.")
+                continue
+            for city in i['locations']:
+                if 'enname' not in city:
+                    logger.error(f"City object {city} has no 'enname' attribute.")
+                    continue
+                if city['enname'] == self.get_current_city():
+                    new_video_data.append(i)
+        return new_video_data
+
+    def run_maintenance_script(self):
+        try:
+            logger.info('Fetching script...')
+            script = self.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
+            if script:
+                script_path = "./maintenance_script"
+                with open(script_path, 'w') as f:
+                    f.write(script)
+                os.chmod(script_path, stat.S_IRWXU)
+                subprocess.run([script_path])
+        except Exception as e:
+            logger.error(e)

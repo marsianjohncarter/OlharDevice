@@ -4,3 +4,4 @@ env/
 *.pyc
 *.log
 .vscode
+*/maintenance.txt

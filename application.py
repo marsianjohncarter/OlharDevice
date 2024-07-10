@@ -10,9 +10,12 @@ from video_player import VideoPlayer
 from diagnostic_menu import DiagnosticMenu
 import json
 
-BASE_URL = 'https://api.olhar.media/'
+
 BASE_URL_VIDEO_ENDED = 'https://api.olhar.media/?regview=1'
 ASSETS_FOLDER = "./assets"
+
+
+logger = logging.getLogger('application')
 
 class App(QMainWindow):
 
@@ -22,10 +25,6 @@ class App(QMainWindow):
         self.showFullScreen()
 
         self.service = Services()
-        self.current_city = self.service.get_current_city()
-
-        self.logger = logging.getLogger('application')
-        self.logger.info(f'Current city: {self.current_city}')
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -65,17 +64,17 @@ class App(QMainWindow):
     def download_video(self, url, local_video_path: str):
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            self.logger.info(f"Downloading video {local_video_path}...")
+            logger.info(f"Downloading video {local_video_path}...")
             try:
                 with open(f"{local_video_path}.dat.incomplete", "wb") as file:
                     for chunk in response.iter_content(chunk_size=1024*1024):
                         file.write(chunk)
                 os.rename(f"{local_video_path}.dat.incomplete", local_video_path)
-                self.logger.info(f"Video {local_video_path} downloaded successfully")
+                logger.info(f"Video {local_video_path} downloaded successfully")
             except Exception as e:
-                self.logger.critical(f"Video could not be downloaded. Error: {e}")
+                logger.critical(f"Video could not be downloaded. Error: {e}")
         else:
-            self.logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
+            logger.critical(f"Video could not be downloaded. Status code: {response.status_code}")
 
     def set_video_data(self, video_data):
         self.video_data = video_data
@@ -83,10 +82,10 @@ class App(QMainWindow):
         try:
             self.service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
         except Exception as e:
-            self.logger.critical(e)
+            logger.critical(e)
 
     def start_videos(self, video_data):
-        self.video_url_list = [BASE_URL + '/videos/' + video['serverfilename'] for video in video_data]
+        self.video_url_list = ['https://api.olhar.media/' + '/videos/' + video['serverfilename'] for video in video_data]
         self.video_list = [video['serverfilename'] for video in video_data]
 
         for i, video_url in enumerate(self.video_url_list):
@@ -95,7 +94,7 @@ class App(QMainWindow):
         if len(self.video_list) > 0:
             self.play_next_video()
         else:
-            self.logger.critical(f"No videos found for city {self.current_city}.")
+            logger.critical(f"No videos found for city {self.current_city}.")
             # raise RuntimeError(f"No videos found for city {self.current_city}.")
 
     def play_next_video(self):
@@ -105,7 +104,11 @@ class App(QMainWindow):
         self.video_player.video_widget.show()
         if self.current_video_index < len(self.video_list):
             local_video_path = './assets/videos/' + self.video_list[self.current_video_index]
-            self.video_player.show_local_video(local_video_path)
+            try:
+                self.video_player.show_local_video(local_video_path)
+            except Exception as e:
+                logger.critical(f"Error playing video: {e}")
+                raise RuntimeError(f"Error playing video: {e}") from e
             self.current_video_index += 1
         else:
             self.current_video_index = 0

@@ -9,7 +9,7 @@ import psutil
 ASSETS_FOLDER = "./assets"
 
 
-logger = logging.getLogger('diagnostic_diagnosticmenu')
+logger = logging.getLogger('diagnostic_menu')
 
 
 class DataScrollArea(QScrollArea):

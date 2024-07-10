@@ -6,7 +6,6 @@ import logging
 from datetime import date
 
 
-logging.basicConfig(filename=f'./assets/logs/{date.today()}.log', level=logging.DEBUG)
 logger = logging.getLogger('video_player')
 
 class VideoPlayer(QWidget):
@@ -30,7 +29,6 @@ class VideoPlayer(QWidget):
             self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(video_path)))
             self.media_player.play()
         except Exception as e:
-            logger.critical(f"Error playing video: {e}")
             raise RuntimeError(f"Error playing video: {video_path}") from e
 
     def check_status(self, status):
