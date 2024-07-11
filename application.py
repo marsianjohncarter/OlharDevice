@@ -79,10 +79,6 @@ class App(QMainWindow):
     def set_video_data(self, video_data):
         self.video_data = video_data
         self.diagnostic_window = DiagnosticMenu(json.dumps(video_data, indent=4))
-        try:
-            self.service.save_json(self.video_data, f'{ASSETS_FOLDER}/data/video_data.json')
-        except Exception as e:
-            logger.critical(e)
 
     def start_videos(self, video_data):
         self.video_url_list = ['https://api.olhar.media/' + '/videos/' + video['serverfilename'] for video in video_data]

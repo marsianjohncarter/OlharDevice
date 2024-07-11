@@ -120,16 +120,12 @@ class Services:
                 return [latitude, longitude]
         except Exception as e:
             logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
-            try:
-                g = geocoder.ip('me')
-                return g.latlng
-            except Exception as e:
-                logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
-                raise RuntimeError(f'Error getting GPS coordinates through IP geolocation') from e
-
-    def save_json(self, dictionary, path: str):
-        with open(path, "w") as outfile:
-            json.dump(dictionary, outfile, indent=4)
+        try:
+            g = geocoder.ip('me')
+            return g.latlng
+        except Exception as e:
+            logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
+            raise RuntimeError(f'Error getting GPS coordinates through IP geolocation') from e
 
     def get_current_city(self):
 

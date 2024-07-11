@@ -11,11 +11,10 @@ Ensure the following dependencies are installed:
 - geopy
 - darkdetect
 - screen-brightness-control
-- logging
 
 Install the dependencies using:
 ```bash
-pip install PyQt5 requests qrcode geopy darkdetect screen-brightness-control logging
+pip install PyQt5 requests qrcode geopy darkdetect screen-brightness-control 
 ```
 
 ### `main.py`
