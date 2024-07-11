@@ -7,7 +7,7 @@ import qrcode
 import requests
 from services import Services
 from video_player import VideoPlayer
-from diagnostic_menu import DiagnosticMenu
+from diagnostic_window import DiagnosticWindow
 import json
 
 
@@ -78,7 +78,7 @@ class App(QMainWindow):
 
     def set_video_data(self, video_data):
         self.video_data = video_data
-        self.diagnostic_window = DiagnosticMenu(json.dumps(video_data, indent=4))
+        self.diagnostic_window = DiagnosticWindow(json.dumps(video_data, indent=4))
 
     def start_videos(self, video_data):
         self.video_url_list = ['https://api.olhar.media/' + '/videos/' + video['serverfilename'] for video in video_data]

@@ -86,7 +86,7 @@ class LogScrollArea(QScrollArea):
         else:
             super().keyPressEvent(qKeyEvent)
 
-class DiagnosticMenu(QMainWindow):
+class DiagnosticWindow(QMainWindow):
     sig = pyqtSignal()
 
     def __init__(self, video_data):
