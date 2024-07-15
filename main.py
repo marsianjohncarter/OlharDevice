@@ -2,61 +2,49 @@ import os
 from services import Services
 from application import App
 from PyQt5.QtWidgets import QApplication
+import logging
+from datetime import date, timedelta
+import screen_brightness_control as sbc
+import os
 
+BASE_DIRECTRY = './assets/logs/'
 
-BASE_URL = 'https://api.olhar.media/'
-
-service = Services()
-
-logger = service.get_logger('main')
 
 def main():
-    # try:
-    #     logger.info('Fetching script...')
-    #     script = service.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
-    #     if script:
-    #         if service.is_valid_bash(script):
-    #             with open('script.sh', 'wb') as f:
-    #                 f.write(script.encode())
-    #             service.run_bash('./script.sh')
-    #             os.remove('./script.sh')
-    #             logger.info('Script executed successfully')
-    #         elif service.is_valid_python(script):
-    #             with open('script.py', 'wb') as f:
-    #                 f.write(script.encode())
-    #             service.run_python('./script.py')
-    #             os.remove('./script.py')
-    #             logger.info('Script executed successfully')
-    # except Exception as e:
-    #     logger.error(e)
+    service = Services()
 
+    logging.basicConfig(filename=f'{BASE_DIRECTRY}{date.today()}.log', level=logging.DEBUG)
+    logger = logging.getLogger('main')
+
+    service.run_maintenance_script()
+    delete_old_logs()
+    service.set_brightness()
     try:   
         logger.info('Fetching video data...')
-        return service.fetch_json(f'{BASE_URL}?getvideos&equipid=1')
+        video_data = service.fetch_json(f'?getvideos&equipid=1')
     except Exception as e:
-        logger.error(e)
-
-if __name__ == "__main__":
+        logger.critical(e)
+        raise RuntimeError('Failed to fetch video data') from e
+    
     app = QApplication([])
-    video_data = main()
     w = App()
-    w.load_video_data(video_data)
-    w.load_videos(video_data)
+    w.set_video_data(service.filter_video_data(video_data))
+    w.start_videos(service.filter_video_data(video_data))
     w.show()
     app.exec_()
 
+def delete_old_logs():
+    for filename in os.scandir(BASE_DIRECTRY):
+        if not filename.is_file():
+            continue
+        date_created = filename.name[:10]
+        week_ago = date.today() - timedelta(days=7)
+        if date_created == str(week_ago):
+            os.remove(os.path.join(BASE_DIRECTRY, filename.name))
 
-# importing modules
-from geopy.geocoders import Nominatim
-from services import Services
-# calling the nominatim tool
-geoLoc = Nominatim(user_agent="GetLoc")
-service = Services()
 
-loc = service.get_lat_lon()
-# passing the coordinates
-locname = geoLoc.reverse(f'50.0 40.0')
-# locname = geoLoc.reverse(f'{loc[0]} {loc[1]}')
-address = locname.raw['address']
-# printing the address/location name
-print(address)
+if __name__ == "__main__":
+    main()
+
+sbc.fade_brightness(100, increment = 10)
+

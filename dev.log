@@ -1,6 +1,0 @@
-2024-06-28 13:35:19,447  urllib3.connectionpool  DEBUG  Starting new HTTP connection (1): ipinfo.io:80
-2024-06-28 13:35:19,592  urllib3.connectionpool  DEBUG  http://ipinfo.io:80 "GET /json HTTP/1.1" 200 336
-2024-06-28 13:35:19,592  geocoder.base   INFO  Requested http://ipinfo.io/json
-2024-06-28 13:35:19,592     geopy  DEBUG  Nominatim.reverse: https://nominatim.openstreetmap.org/reverse?lat=50.0&lon=40.0&format=json&addressdetails=1
-2024-06-28 13:35:19,593  urllib3.connectionpool  DEBUG  Starting new HTTPS connection (1): nominatim.openstreetmap.org:443
-2024-06-28 13:35:19,976  urllib3.connectionpool  DEBUG  https://nominatim.openstreetmap.org:443 "GET /reverse?lat=50.0&lon=40.0&format=json&addressdetails=1 HTTP/1.1" 200 1332

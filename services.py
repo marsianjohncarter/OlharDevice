@@ -1,51 +1,38 @@
+import json
 import os
+import stat
 import requests
 import subprocess
 import configparser
 import geocoder
 import ast
 import logging
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
+import serial
+import darkdetect
+import screen_brightness_control as sbc
+
+
+SERIAL_PORT = "/dev/ttyUSB0"
+BASE_URL = 'https://api.olhar.media/'
+
+logger = logging.getLogger('services')
+
 
 class Services:
-    def __init__(self):
-        self.logger = self.get_logger('services')
-        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-
-    def run_bash(self, script_path):
-        try:
-            subprocess.run(["bash", script_path], capture_output=True)
-            self.logger.info('Script executed successfully')
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f'Error running bash script: {e}')
-
-    def run_python(self, script_path):
-        try:
-            with open(script_path, 'r') as f:
-                script = f.read()
-            exec(script)
-            self.logger.info('Script executed successfully')
-        except Exception as e:
-            self.logger.error(f'Error running python script: {e}')
-            
     def fetch_json(self, url):
-        response = requests.get(url)
-        if (response.status_code != 204 and response.status_code < 300 and
+        response = requests.get(f'{BASE_URL}{url}')
+        if not (response.status_code != 204 and response.status_code < 300 and
                 response.headers["content-type"].strip().startswith("application/json")):
-            try:
-                return response.json()
-            except ValueError:
-                self.logger.critical(f'Error loading JSON: {response.status_code}')
-                return response.status_code
-        self.logger.critical(f'Error loading JSON: {response.status_code}')
-        return None
+            raise RuntimeError(f'Error loading json: {response.status_code}')
+        return response.json()
 
     def fetch_script(self, url):
         response = requests.get(url)
         if response.status_code != 204:
-            self.logger.info('Script loaded successfully')
+            logger.info('Script loaded successfully')
             return response.text
-        self.logger.error(f'Error loading script: {response.status_code}')
+        logger.error(f'Error loading script: {response.status_code}')
         return None
 
     def is_valid_python(self, code):
@@ -74,9 +61,9 @@ class Services:
         }
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            self.logger.info('Video view registered successfully')
+            logger.info('Video view registered successfully')
         else:
-            self.logger.error(f'Error registering video view: {response.status_code}')
+            logger.error(f'Error registering video view: {response.status_code}')
 
     def get_param_from_config(self, config_path: str, param_name: str):
         config = configparser.ConfigParser()
@@ -85,45 +72,103 @@ class Services:
             part_number = config['General'][f'{param_name}']
             return part_number
         except FileNotFoundError:
-            self.logger.error(f'Config file not found: {config_path}')
+            logger.error(f'Config file not found: {config_path}')
             return None
 
+    def formatDegreesMinutes(self, coordinates, digits):
+    
+        parts = coordinates.split(".")
+
+        if (len(parts) != 2):
+            return coordinates
+
+        if (digits > 3 or digits < 2):
+            return coordinates
+        
+        left = parts[0]
+        right = parts[1]
+        degrees = str(left[:digits])
+        minutes = str(right[:3])
+
+        return degrees + "." + minutes
+
     def get_lat_lon(self):
-        g = geocoder.ip('me')
-        return g.latlng
+        try:
+                gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
+                
+                data = gps.readline().decode('utf-8').rstrip()
+                message = data[0:6]
+                if (message == "$GNRMC"):
+                    # GPRMC = Рекомендуемые минимальные конкретные данные GPS / транзит
+                    # Чтение фиксированных данных GPS является альтернативным подходом, 
+                    # который также работает
+                    parts = data.split(",")
+                    if parts[2] == 'V':
+                        # V = Предупреждение, скорее всего, спутников нет в поле зрения ...
+                        raise RuntimeError('No satellites in view')
+                    else:
+                        # Получить данные о местоположении, которые были переданы с сообщением GPRMC. 
+                        # В этом примере интересуют только долгота и широта. Для других значений можно
+                        # обратиться к http://aprs.gids.nl/nmea/#rmc
+                        longitude = self.formatDegreesMinutes(parts[5], 3)
+                        latitude = self.formatDegreesMinutes(parts[3], 2)
+                        logger.info("Device position: lon = " + str(longitude) + ", lat = " + str(latitude))
+                else:
+                    raise RuntimeError('Invalid NMEA message')
 
-    def delete_file(self, path):
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-                self.logger.info(f'Deleted file: {path}')
-            except PermissionError:
-                self.logger.error(f'Error deleting file: {path}')
+                gps.close()
+                return [latitude, longitude]
+        except Exception as e:
+            logger.error(f'Error getting GPS coordinates through serial port: {e}\n Falling back to IP geolocation...')
+        try:
+            g = geocoder.ip('me')
+            return g.latlng
+        except Exception as e:
+            logger.critical(f'Error getting GPS coordinates through IP geolocation: {e}')
+            raise RuntimeError(f'Error getting GPS coordinates through IP geolocation') from e
 
+    def get_current_city(self):
 
-    def get_logger(self, name):
-        log_format = '%(asctime)s  %(name)8s  %(levelname)5s  %(message)s'
-        logging.basicConfig(level=logging.DEBUG,
-                            format=log_format,
-                            filename='dev.log',
-                            filemode='w')
-        return logging.getLogger(name)
+        geolocator = Photon(user_agent="measurements")
 
+        location_lat_lon = self.get_lat_lon()
 
-    def get_city_from_coordinates(self, latitude, longitude):
-        geoLoc = Nominatim(user_agent="GetLoc")
+        latitude = f"{location_lat_lon[0]}"
+        longitude = f"{location_lat_lon[1]}"
+        
+        location = geolocator.reverse(f'{latitude},{longitude}')
 
-        loc = self.get_lat_lon()
-        locname = geoLoc.reverse(f'50.0 40.0')
-        address = locname.raw['address']
-        print(address)
+        return location.raw['properties']['name']
 
-    # latitude, longitude = get_current_location()
-    # if latitude and longitude:
-    #     city = get_city_from_coordinates(latitude, longitude)
-    #     if city:
-    #         print(f"The current city is: {city}")
-    #     else:
-    #         print("Could not determine the city.")
-    # else:
-    #     print("Could not determine the current location.")
+    def set_brightness(self):
+        if darkdetect.isDark():
+            sbc.fade_brightness(50)
+        else:
+            sbc.fade_brightness(100, increment = 10)
+
+    def filter_video_data(self, video_data):
+        new_video_data = []
+        for i in video_data:
+            if 'locations' not in i:
+                logger.error(f"Video object {i} has no 'locations' attribute.")
+                continue
+            for city in i['locations']:
+                if 'enname' not in city:
+                    logger.error(f"City object {city} has no 'enname' attribute.")
+                    continue
+                if city['enname'] == self.get_current_city():
+                    new_video_data.append(i)
+        return new_video_data
+
+    def run_maintenance_script(self):
+        try:
+            logger.info('Fetching script...')
+            script = self.fetch_script(f'{BASE_URL}?getconfigupdate&equipid=1')
+            if script:
+                script_path = "./maintenance_script"
+                with open(script_path, 'w') as f:
+                    f.write(script)
+                os.chmod(script_path, stat.S_IRWXU)
+                subprocess.run([script_path])
+        except Exception as e:
+            logger.error(e)
