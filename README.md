@@ -2,7 +2,7 @@
 
 ## Documentation
 
-_This code is used by https://olhar.media/ in production._
+
 
 ### Overview
 This documentation is aimed at programmers who are unfamiliar with the codebase. It explains the purpose and functionality of each file and class in detail.
@@ -100,3 +100,5 @@ The `video_player.py` file contains the video player component that plays videos
 - **Media Status Check (`check_status`)**:
   - Checks the media player status and emits a `finished` signal when a video ends.
 
+
+_This code is (sadly) used by https://olhar.media/ in production._
